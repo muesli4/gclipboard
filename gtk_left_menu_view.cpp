@@ -1,6 +1,7 @@
 #include <glibmm.h>
 
 #include "gtk_left_menu_view.hpp"
+#include "util.hpp"
 
 gtk_left_menu_view::gtk_left_menu_view(clipboard_controller & ctrl)
     : _empty_indicator_menu_item("No items")
@@ -47,6 +48,28 @@ void gtk_left_menu_view::on_clear()
         show_empty_indicator();
 }
 
+void gtk_left_menu_view::on_add(std::string const & s, unsigned int id)
+{
+    hide_empty_indicator();
+
+    // TODO trim string to length and replace newlines
+    _menu_items.emplace_front(std::make_pair(Glib::Markup::escape_text(replace_special_whitespace_characters(s.substr(0, 20))), id));
+    Gtk::MenuItem & mi = _menu_items.front().first;
+
+    enable_pango_markup(mi);
+
+    mi.signal_activate().connect(
+        [this, id]()
+        {
+            this->_ctrl.clipboard_select_active(id);
+        }
+    );
+
+    mi.show();
+    // add the new item on top
+    this->prepend(mi);
+}
+
 void gtk_left_menu_view::on_remove_oldest()
 {
     this->remove(_menu_items.back().first);
@@ -82,24 +105,3 @@ gtk_left_menu_view::buffer_iterator gtk_left_menu_view::find_id(unsigned int id)
     return std::find_if(_menu_items.begin(), _menu_items.end(), [id](std::pair<Gtk::MenuItem, unsigned int> const & p){ return p.second == id; });
 }
 
-
-void gtk_left_menu_view::on_add(std::string const & s, unsigned int id)
-{
-    hide_empty_indicator();
-    // TODO trim string to length and replace newlines
-    _menu_items.emplace_front(std::make_pair(Glib::Markup::escape_text(s.substr(0, 20)), id));
-    Gtk::MenuItem & mi = _menu_items.front().first;
-
-    enable_pango_markup(mi);
-
-    mi.signal_activate().connect(
-        [this, id]()
-        {
-            this->_ctrl.clipboard_select_active(id);
-        }
-    );
-
-    mi.show();
-    // add the new item on top
-    this->prepend(mi);
-}

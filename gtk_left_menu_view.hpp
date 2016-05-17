@@ -9,7 +9,7 @@
 #include "clipboard_view.hpp"
 #include "clipboard_controller.hpp"
 
-
+// TODO maybe remove public inheritance of Menu
 struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
 {
     gtk_left_menu_view(clipboard_controller & ctrl);

@@ -14,12 +14,10 @@
 #include "gtk_clipboard_model.hpp"
 #include "gtk_left_menu_view.hpp"
 
-// TODO maybe remove public inheritance of Menu
-
 int main(int argc, char ** argv)
 {
     auto app = Gtk::Application::create(argc, argv, "org.gclipboard");
-    auto status_icon = Gtk::StatusIcon::create("gtk-about");
+    auto status_icon = Gtk::StatusIcon::create("edit-paste");
 
     gtk_clipboard_model m(10);
 
