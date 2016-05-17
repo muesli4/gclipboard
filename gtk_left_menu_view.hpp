@@ -15,6 +15,7 @@ struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
     gtk_left_menu_view(clipboard_controller & ctrl);
 
     // methods inherited to implement a view
+    void on_move_front(unsigned int id);
     void on_select_active(unsigned int id);
     void on_unselect_active(unsigned int id);
     void on_clear();
@@ -27,7 +28,7 @@ struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
     typedef buffer_type::iterator buffer_iterator;
 
     // TODO factor out into utilities
-    static void enable_pango_markup(Gtk::MenuItem & mi);
+    static void set_pango_options_to_label(Gtk::MenuItem & mi);
 
     void hide_empty_indicator();
     void show_empty_indicator();

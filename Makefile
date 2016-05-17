@@ -1,6 +1,6 @@
 CXX      = g++
 
-LIBS     = gtkmm-3.0 gdkmm-3.0
+LIBS     = gtkmm-3.0 gdkmm-3.0 pangomm-1.4
 
 CXXFLAGS = '-std=c++11' '-std=gnu++11' '-Wall' `pkg-config --cflags $(LIBS)` -I/usr/include/boost
 LDFLAGS  = `pkg-config --libs $(LIBS)`

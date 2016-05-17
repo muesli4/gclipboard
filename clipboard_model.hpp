@@ -1,5 +1,5 @@
-#ifndef CLIPBOARD_MODEL_HPP
-#define CLIPBOARD_MODEL_HPP
+#ifndef GCLIPBOARD_CLIPBOARD_MODEL_HPP
+#define GCLIPBOARD_CLIPBOARD_MODEL_HPP
 
 // TODO make interface ?
 
@@ -23,7 +23,8 @@ struct clipboard_model
 
     protected:
 
-    // view signals
+    // signals used to message all views about changes in the model
+    void emit_move_front(unsigned int id);
     void emit_add(std::string const & s, unsigned int id);
     void emit_clear();
     void emit_select_active(unsigned int id);

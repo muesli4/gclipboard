@@ -29,6 +29,12 @@ clipboard_model::~clipboard_model()
 {
 }
 
+void clipboard_model::emit_move_front(unsigned int id)
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_move_front(id);
+}
+
 void clipboard_model::emit_add(std::string const & s, unsigned int id)
 {
     for (auto ptr : _view_pointers)

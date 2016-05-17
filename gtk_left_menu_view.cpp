@@ -1,15 +1,36 @@
+#include <utility>
+#include <iterator>
+
 #include <glibmm.h>
+#include <pangomm.h>
 
 #include "gtk_left_menu_view.hpp"
 #include "util.hpp"
 
 gtk_left_menu_view::gtk_left_menu_view(clipboard_controller & ctrl)
-    : _empty_indicator_menu_item("No items")
+    : _empty_indicator_menu_item("Empty")
     , _ctrl(ctrl)
 {
     _empty_indicator_menu_item.set_sensitive(false);
     _empty_indicator_menu_item.show();
     this->append(_empty_indicator_menu_item);
+}
+
+void gtk_left_menu_view::on_move_front(unsigned int id)
+{
+    auto it = find_id(id);
+    if (it != _menu_items.end())
+    {
+        // update menu
+        this->remove(it->first);
+        this->prepend(it->first);
+
+        // update representation
+        std::rotate( _menu_items.begin()
+                   , it
+                   , it + 1
+                   );
+    }
 }
 
 void gtk_left_menu_view::on_select_active(unsigned int id)
@@ -31,7 +52,7 @@ void gtk_left_menu_view::on_unselect_active(unsigned int id)
     {
         auto & mi = it->first;
         auto const & text = mi.get_label();
-        // FIXME is there some less hacky way to set and remove bold layout on a MenuItem?
+        //// FIXME is there some less hacky way to set and remove bold layout on a MenuItem?
         mi.set_label(text.substr(3, text.size() - 7));
     }
 }
@@ -42,9 +63,9 @@ void gtk_left_menu_view::on_clear()
     {
         this->remove(p.first);
     }
-    int size = _menu_items.size();
+    bool empty = _menu_items.empty();
     _menu_items.clear();
-    if (size != 0)
+    if (!empty)
         show_empty_indicator();
 }
 
@@ -53,10 +74,15 @@ void gtk_left_menu_view::on_add(std::string const & s, unsigned int id)
     hide_empty_indicator();
 
     // TODO trim string to length and replace newlines
-    _menu_items.emplace_front(std::make_pair(Glib::Markup::escape_text(replace_special_whitespace_characters(s.substr(0, 20))), id));
+    _menu_items.emplace_front(
+        std::make_pair( Glib::Markup::escape_text(replace_special_whitespace_characters(s))
+                      , id
+                      )
+    );
+
     Gtk::MenuItem & mi = _menu_items.front().first;
 
-    enable_pango_markup(mi);
+    set_pango_options_to_label(mi);
 
     mi.signal_activate().connect(
         [this, id]()
@@ -81,12 +107,14 @@ void gtk_left_menu_view::on_remove_oldest()
     }
 }
 
-void gtk_left_menu_view::enable_pango_markup(Gtk::MenuItem & mi)
+void gtk_left_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
 {
     auto l = dynamic_cast<Gtk::Label *>(mi.get_child());
     if (l != 0)
     {
         l->set_use_markup();
+        l->set_ellipsize(Pango::ELLIPSIZE_END);
+        l->set_max_width_chars(40);
     }
 }
 

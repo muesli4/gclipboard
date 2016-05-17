@@ -1,31 +1,32 @@
 #include "gtk_clipboard_model.hpp"
 
 #include <utility>
+#include <iterator>
 
 gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     : _text_buffer(buffer_size)
     , _active_valid(false)
-    , _primary(Gtk::Clipboard::get(GDK_SELECTION_PRIMARY))
+    , _primary_ref(Gtk::Clipboard::get(GDK_SELECTION_PRIMARY))
     , _ignore_primary(false)
-    , _clipboard(Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD))
+    , _clipboard_ref(Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD))
     , _ignore_clipboard(false)
 {
-    _primary_con = _primary->signal_owner_change().connect(
+    _primary_con = _primary_ref->signal_owner_change().connect(
         [&](GdkEventOwnerChange * e)
         {
-            handle_owner_change(e, _ignore_primary, _primary, _ignore_clipboard, _clipboard);
+            handle_owner_change(e, _ignore_primary, _primary_ref, _ignore_clipboard, _clipboard_ref);
         }
     );
 
-    _clipboard_con = _clipboard->signal_owner_change().connect(
+    _clipboard_con = _clipboard_ref->signal_owner_change().connect(
         [&](GdkEventOwnerChange * e)
         {
-            handle_owner_change(e, _ignore_clipboard, _clipboard, _ignore_primary, _primary);
+            handle_owner_change(e, _ignore_clipboard, _clipboard_ref, _ignore_primary, _primary_ref);
         }
     );
 }
 
-void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, bool & ignore_source, Glib::RefPtr<Gtk::Clipboard> source, bool & ignore_other, Glib::RefPtr<Gtk::Clipboard> other)
+void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, bool & ignore_source, Glib::RefPtr<Gtk::Clipboard> source_ref, bool & ignore_other, Glib::RefPtr<Gtk::Clipboard> other_ref)
 {
     if (ignore_source)
     {
@@ -33,11 +34,11 @@ void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, bool & ig
     }
     else
     {
-        auto text = source->wait_for_text();
+        auto text = source_ref->wait_for_text();
 
         // sync with other clipboard
         ignore_other = true;
-        other->set_text(text);
+        other_ref->set_text(text);
 
         // add to internal buffer
         if (_text_buffer.full())
@@ -57,7 +58,7 @@ void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, bool & ig
 
 void gtk_clipboard_model::update_active_id(unsigned int id)
 {
-    // TODO what if _active_id == id?
+    // TODO what if _active_id == id? it works, but update is not needed, since model does not change
     if (_active_valid)
     {
         emit_unselect_active(_active_id);
@@ -70,9 +71,9 @@ void gtk_clipboard_model::update_active_id(unsigned int id)
 void gtk_clipboard_model::clear()
 {
     _ignore_primary = true;
-    _primary->set_text("");
+    _primary_ref->set_text("");
     _ignore_clipboard = true;
-    _clipboard->set_text("");
+    _clipboard_ref->set_text("");
     _text_buffer.clear();
     _active_valid = false;
     emit_clear();
@@ -85,10 +86,18 @@ void gtk_clipboard_model::select_active(unsigned int id)
     if (it != end_it)
     {
         _ignore_primary = true;
-        _primary->set_text(it->first);
+        _primary_ref->set_text(it->first);
         _ignore_clipboard = true;
-        _clipboard->set_text(it->first);
+        _clipboard_ref->set_text(it->first);
         update_active_id(id);
+
+        // additionally this model will move active entries to the front
+        std::rotate( _text_buffer.begin()
+                   , it
+                   , it + 1
+                   );
+
+        emit_move_front(id);
     }
 }
 
