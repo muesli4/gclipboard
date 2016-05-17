@@ -96,6 +96,20 @@ void gtk_left_menu_view::on_add(std::string const & s, unsigned int id)
     this->prepend(mi);
 }
 
+void gtk_left_menu_view::on_remove(unsigned int id)
+{
+    auto it = find_id(id);
+    if (it != _menu_items.end())
+    {
+        this->remove(it->first);
+        _menu_items.erase(it);
+        if (_menu_items.empty())
+        {
+            show_empty_indicator();
+        }
+    }
+}
+
 void gtk_left_menu_view::on_remove_oldest()
 {
     this->remove(_menu_items.back().first);

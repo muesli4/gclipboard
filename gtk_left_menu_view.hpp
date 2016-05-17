@@ -20,6 +20,7 @@ struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
     void on_unselect_active(unsigned int id);
     void on_clear();
     void on_add(std::string const & s, unsigned int id);
+    void on_remove(unsigned int id);
     void on_remove_oldest();
 
     private:

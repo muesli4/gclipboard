@@ -7,8 +7,6 @@
 #include "gtk_clipboard_model.hpp"
 #include "gtk_left_menu_view.hpp"
 
-// TODO move selected entry to the top
-// TODO add removal of entry ids
 // TODO settings
 // TODO about dialog
 // TODO manage contents

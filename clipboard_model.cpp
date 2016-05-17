@@ -59,6 +59,12 @@ void clipboard_model::emit_unselect_active(unsigned int id)
         ptr->on_unselect_active(id);
 }
 
+void clipboard_model::emit_remove(unsigned int id)
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_remove(id);
+}
+
 void clipboard_model::emit_remove_oldest()
 {
     for (auto ptr : _view_pointers)

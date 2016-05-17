@@ -7,7 +7,7 @@
 
 struct clipboard_controller
 {
-
+    virtual void clipboard_remove(unsigned int id) = 0;
     virtual void clipboard_select_active(unsigned int id) = 0;
     virtual void clipboard_clear() = 0;
 };

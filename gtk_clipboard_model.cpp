@@ -81,9 +81,8 @@ void gtk_clipboard_model::clear()
 
 void gtk_clipboard_model::select_active(unsigned int id)
 {
-    auto const end_it = _text_buffer.end();
-    auto it = find_if(_text_buffer.begin(), end_it, [id](std::pair<std::string, unsigned int> const & p) { return p.second == id; });
-    if (it != end_it)
+    auto it = find_id(id);
+    if (it != _text_buffer.end())
     {
         _ignore_primary = true;
         _primary_ref->set_text(it->first);
@@ -99,6 +98,30 @@ void gtk_clipboard_model::select_active(unsigned int id)
 
         emit_move_front(id);
     }
+}
+
+void gtk_clipboard_model::remove(unsigned int id)
+{
+    auto it = find_id(id);
+    if (it != _text_buffer.end())
+    {
+        _text_buffer.erase(it);
+
+        emit_remove(id);
+
+        // did we delete the active entry?
+        if (_active_valid && _active_id == id && !_text_buffer.empty())
+        {
+            // make the first entry the active one
+            _active_id = _text_buffer.front().second;
+            emit_select_active(_active_id);
+        }
+    }
+}
+
+gtk_clipboard_model::iterator gtk_clipboard_model::find_id(unsigned int id)
+{
+    return find_if(_text_buffer.begin(), _text_buffer.end(), [id](std::pair<std::string, unsigned int> const & p) { return p.second == id; });
 }
 
 gtk_clipboard_model::~gtk_clipboard_model()

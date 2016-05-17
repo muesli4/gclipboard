@@ -11,7 +11,8 @@ struct gtk_clipboard_model : clipboard_model
     gtk_clipboard_model(unsigned int buffer_size);
 
     void clear();
-    void select_active(unsigned int n);
+    void select_active(unsigned int id);
+    void remove(unsigned int id);
 
     ~gtk_clipboard_model();
 
@@ -24,11 +25,13 @@ struct gtk_clipboard_model : clipboard_model
     typedef boost::circular_buffer<std::pair<std::string, unsigned int>> buffer_type;
     typedef buffer_type::iterator iterator;
 
+    iterator find_id(unsigned int id);
+
     // the text buffer, where the first is the newest and back is the oldest
     buffer_type _text_buffer;
 
     // the active text in the clipboard
-    int _active_id;
+    unsigned int _active_id;
     bool _active_valid;
 
     // clipboard used for mouse selection

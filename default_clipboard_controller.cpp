@@ -14,3 +14,9 @@ void default_clipboard_controller::clipboard_select_active(unsigned int id)
 {
     _m.select_active(id);
 }
+
+void default_clipboard_controller::clipboard_remove(unsigned int id)
+{
+    _m.remove(id);
+}
+

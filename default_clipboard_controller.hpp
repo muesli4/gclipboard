@@ -12,6 +12,7 @@ struct default_clipboard_controller : clipboard_controller
 
     void clipboard_clear();
     void clipboard_select_active(unsigned int id);
+    void clipboard_remove(unsigned int id);
 
     private:
     clipboard_model & _m;

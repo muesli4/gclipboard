@@ -18,6 +18,7 @@ struct clipboard_model
     // methods
     virtual void clear() = 0;
     virtual void select_active(unsigned int n) = 0;
+    virtual void remove(unsigned int n) = 0;
 
     virtual ~clipboard_model();
 
@@ -29,6 +30,7 @@ struct clipboard_model
     void emit_clear();
     void emit_select_active(unsigned int id);
     void emit_unselect_active(unsigned int id);
+    void emit_remove(unsigned int id);
     void emit_remove_oldest();
 
     unsigned int fresh_id();

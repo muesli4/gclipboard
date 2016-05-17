@@ -20,6 +20,9 @@ struct clipboard_view
     // a new entry has been added to the clipboard
     virtual void on_add(std::string const & s, unsigned int id) = 0;
 
+    // an entry has been removed from the clipboard
+    virtual void on_remove(unsigned int id) = 0;
+
     // the oldest entry has been dropped from the clipboard
     virtual void on_remove_oldest() = 0;
 };
