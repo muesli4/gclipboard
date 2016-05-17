@@ -8,8 +8,8 @@
 struct clipboard_controller
 {
 
-    virtual void select_active_entry(int n) = 0;
-    virtual void clear_clipboard_entries() = 0;
+    virtual void clipboard_select_active(unsigned int id) = 0;
+    virtual void clipboard_clear() = 0;
 };
 
 #endif

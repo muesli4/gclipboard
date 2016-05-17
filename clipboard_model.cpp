@@ -2,6 +2,11 @@
 
 #include "clipboard_model.hpp"
 
+clipboard_model::clipboard_model()
+    : _id_src(0)
+{
+}
+
 void clipboard_model::add_view(clipboard_view & v)
 {
     clipboard_view * p = &v;
@@ -20,22 +25,45 @@ void clipboard_model::remove_view(clipboard_view & v)
     }
 }
 
-void clipboard_model::emit_add_clipboard_entry(std::string const & s)
+clipboard_model::~clipboard_model()
 {
-    for (auto ptr : _view_pointers)
-        ptr->on_add_clipboard_entry(s);
 }
 
-void clipboard_model::emit_clear_clipboard_entries()
+void clipboard_model::emit_add(std::string const & s, unsigned int id)
 {
     for (auto ptr : _view_pointers)
-        ptr->on_clear_clipboard_entries();
+        ptr->on_add(s, id);
 }
 
-void clipboard_model::emit_select_active_entry(int n)
+void clipboard_model::emit_clear()
 {
     for (auto ptr : _view_pointers)
-        ptr->on_select_active_entry(n);
+        ptr->on_clear();
+}
+
+void clipboard_model::emit_select_active(unsigned int id)
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_select_active(id);
+}
+
+void clipboard_model::emit_unselect_active(unsigned int id)
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_unselect_active(id);
+}
+
+void clipboard_model::emit_remove_oldest()
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_remove_oldest();
+}
+
+unsigned int clipboard_model::fresh_id()
+{
+    auto id = _id_src;
+    _id_src += 1;
+    return id;
 }
 
 std::vector<clipboard_view *>::iterator clipboard_model::find_ptr(clipboard_view * p)

@@ -9,24 +9,34 @@
 
 struct clipboard_model
 {
+    clipboard_model();
+
     // view handling
     void add_view(clipboard_view & v);
     void remove_view(clipboard_view & v);
 
     // methods
-    virtual void clear_clipboard_entries() = 0;
-    virtual void select_active_entry(int n) = 0;
+    virtual void clear() = 0;
+    virtual void select_active(unsigned int n) = 0;
+
+    virtual ~clipboard_model();
 
     protected:
 
     // view signals
-    void emit_add_clipboard_entry(std::string const & s);
-    void emit_clear_clipboard_entries();
-    void emit_select_active_entry(int n);
+    void emit_add(std::string const & s, unsigned int id);
+    void emit_clear();
+    void emit_select_active(unsigned int id);
+    void emit_unselect_active(unsigned int id);
+    void emit_remove_oldest();
+
+    unsigned int fresh_id();
 
     private:
 
     std::vector<clipboard_view *>::iterator find_ptr(clipboard_view * p);
+
+    unsigned int _id_src;
 
     std::vector<clipboard_view *> _view_pointers;
 };

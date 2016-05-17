@@ -5,12 +5,12 @@ default_clipboard_controller::default_clipboard_controller(clipboard_model & m)
 {
 }
 
-void default_clipboard_controller::clear_clipboard_entries()
+void default_clipboard_controller::clipboard_clear()
 {
-    _m.clear_clipboard_entries();
+    _m.clear();
 }
 
-void default_clipboard_controller::select_active_entry(int n)
+void default_clipboard_controller::clipboard_select_active(unsigned int id)
 {
-    _m.select_active_entry(n);
+    _m.select_active(id);
 }
