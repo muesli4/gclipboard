@@ -14,7 +14,9 @@ PKG_CHECK_MODULES(pangomm, pangomm-1.4)
 
 AX_BOOST_BASE([1.35.0],,[AC_MSG_ERROR([boost was not found])])
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile po/Makefile.in])
+
+AM_GNU_GETTEXT([external])
 
 # generate configure script to produce Makefiles
 AC_OUTPUT

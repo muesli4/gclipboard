@@ -6,9 +6,10 @@
 
 #include "gtk_left_menu_view.hpp"
 #include "util.hpp"
+#include "gettext.h"
 
 gtk_left_menu_view::gtk_left_menu_view(clipboard_controller & ctrl)
-    : _empty_indicator_menu_item("Empty")
+    : _empty_indicator_menu_item(gettext("Empty"))
     , _ctrl(ctrl)
 {
     _empty_indicator_menu_item.set_sensitive(false);

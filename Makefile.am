@@ -1,3 +1,3 @@
 ACLOCAL_AMFLAGS = -I m4
-EXTRA_DIST = bootstrap
-SUBDIRS = src
+EXTRA_DIST = config.rpath bootstrap
+SUBDIRS = src po

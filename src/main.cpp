@@ -8,6 +8,8 @@
 #include "gtk_left_menu_view.hpp"
 #include "gtk_history_window_view.hpp"
 
+#include "gettext.h"
+
 // TODO settings
 // TODO about dialog
 // TODO manage contents
@@ -16,6 +18,10 @@
 
 int main(int argc, char ** argv)
 {
+    setlocale(LC_ALL, "");
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    textdomain(PACKAGE);
+
     auto app_ref = Gtk::Application::create(argc, argv, "org.gclipboard");
     auto status_icon_ref = Gtk::StatusIcon::create("edit-paste");
 
@@ -36,10 +42,10 @@ int main(int argc, char ** argv)
 
     // right click menu
     Gtk::Menu right_menu;
-    Gtk::MenuItem clear_item("Clear");
-    Gtk::MenuItem edit_history_item("Edit history");
+    Gtk::MenuItem clear_item(gettext("Clear"));
+    Gtk::MenuItem edit_history_item(gettext("Edit history"));
     Gtk::SeparatorMenuItem sep_item;
-    Gtk::MenuItem quit_item("Quit");
+    Gtk::MenuItem quit_item(gettext("Quit"));
 
     clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
     edit_history_item.signal_activate().connect([&](){ history_window.show(); });

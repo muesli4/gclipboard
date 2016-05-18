@@ -1,10 +1,11 @@
 #include "gtk_history_window_view.hpp"
 #include "util.hpp"
+#include "gettext.h"
 
 gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     : Gtk::Window()
-    , _remove_selected_button("Remove selected")
-    , _remove_all_button("Remove all")
+    , _remove_selected_button(gettext("Remove selected"))
+    , _remove_all_button(gettext("Remove all"))
     , _column_record()
     , _entry_column()
     , _id_column()
@@ -12,7 +13,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     , _ctrl(ctrl)
 
 {
-    this->set_title("History");
+    this->set_title(gettext("History"));
     this->set_icon_name("edit-paste");
     this->set_default_size(700, 500);
 
@@ -27,7 +28,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     // TODO make scrollbar decrease again
     //_list_view_text.set_hscroll_policy(Gtk::SCROLL_MINIMUM);
 
-    _list_view_text.append_column("Entries", _entry_column);
+    _list_view_text.append_column(gettext("Entries"), _entry_column);
 
     _scrolled_window.add(_list_view_text);
     
@@ -69,6 +70,7 @@ gtk_history_window_view::~gtk_history_window_view()
 
 void gtk_history_window_view::on_move_front(unsigned int id)
 {
+    // TODO implement
 }
 
 void gtk_history_window_view::on_select_active(unsigned int id)
