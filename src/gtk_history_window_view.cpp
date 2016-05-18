@@ -13,6 +13,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
 
 {
     this->set_title("History");
+    this->set_icon_name("edit-paste");
     this->set_default_size(700, 500);
 
     _column_record.add(_entry_column);
