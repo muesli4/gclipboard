@@ -45,21 +45,24 @@ int main(int argc, char ** argv)
     Gtk::MenuItem clear_item(gettext("Clear"));
     Gtk::MenuItem edit_history_item(gettext("Edit history"));
     Gtk::SeparatorMenuItem sep_item;
+    Gtk::MenuItem settings_item(gettext("Settings"));
+    Gtk::MenuItem about_item(gettext("About"));
+    Gtk::SeparatorMenuItem sep2_item;
     Gtk::MenuItem quit_item(gettext("Quit"));
 
     clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
     edit_history_item.signal_activate().connect([&](){ history_window.show(); });
     quit_item.signal_activate().connect([app_ref](){ app_ref->release(); });
 
-    clear_item.show();
-    edit_history_item.show();
-    sep_item.show();
-    quit_item.show();
-
     right_menu.append(clear_item);
     right_menu.append(edit_history_item);
     right_menu.append(sep_item);
+    right_menu.append(settings_item);
+    right_menu.append(about_item);
+    right_menu.append(sep2_item);
     right_menu.append(quit_item);
+
+    right_menu.show_all();
 
     status_icon_ref->signal_button_press_event().connect(
         [&, app_ref, status_icon_ref](GdkEventButton * e)

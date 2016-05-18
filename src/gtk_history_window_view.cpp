@@ -78,7 +78,6 @@ void gtk_history_window_view::on_move_front(unsigned int id)
     {
         _list_store_ref->iter_swap(it, cs.begin());
     }
-
 }
 
 void gtk_history_window_view::on_select_active(unsigned int id)
