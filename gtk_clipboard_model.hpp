@@ -16,6 +16,10 @@ struct gtk_clipboard_model : clipboard_model
 
     ~gtk_clipboard_model();
 
+    protected:
+
+    void init_view(clipboard_view & v);
+
     private:
 
     void handle_owner_change(GdkEventOwnerChange * e, bool & ignore_source, Glib::RefPtr<Gtk::Clipboard> source, bool & ignore_other, Glib::RefPtr<Gtk::Clipboard> other);

@@ -13,6 +13,7 @@ void clipboard_model::add_view(clipboard_view & v)
     if (_view_pointers.end() == find_ptr(p))
     {
         _view_pointers.push_back(p);
+        init_view(v);
     }
 }
 

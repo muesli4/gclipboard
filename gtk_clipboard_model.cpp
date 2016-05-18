@@ -128,3 +128,12 @@ gtk_clipboard_model::~gtk_clipboard_model()
 {
 }
 
+void gtk_clipboard_model::init_view(clipboard_view & v)
+{
+    for (auto p : _text_buffer)
+        v.on_add(p.first, p.second);
+
+    if (_active_valid)
+        v.on_select_active(_active_id);
+}
+

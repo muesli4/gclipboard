@@ -33,6 +33,9 @@ struct clipboard_model
     void emit_remove(unsigned int id);
     void emit_remove_oldest();
 
+    // initialize a view with the current state of the model
+    virtual void init_view(clipboard_view & v) = 0;
+
     unsigned int fresh_id();
 
     private:
