@@ -6,11 +6,13 @@
 #include "default_clipboard_controller.hpp"
 #include "gtk_clipboard_model.hpp"
 #include "gtk_left_menu_view.hpp"
+#include "gtk_history_window_view.hpp"
 
 // TODO settings
 // TODO about dialog
 // TODO manage contents
 // TODO save session
+// TODO publish initial changes to view from model
 
 int main(int argc, char ** argv)
 {
@@ -25,23 +27,31 @@ int main(int argc, char ** argv)
     // left click menu
     gtk_left_menu_view left_menu(ctrl);
 
+    // history window
+    gtk_history_window_view history_window(ctrl);
+
     // connect to model
     m.add_view(left_menu);
+    m.add_view(history_window);
 
     // right click menu
     Gtk::Menu right_menu;
     Gtk::MenuItem clear_item("Clear");
+    Gtk::MenuItem edit_history_item("Edit history");
     Gtk::SeparatorMenuItem sep_item;
     Gtk::MenuItem quit_item("Quit");
 
     clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
+    edit_history_item.signal_activate().connect([&](){ history_window.show(); });
     quit_item.signal_activate().connect([app_ref](){ app_ref->release(); });
 
     clear_item.show();
+    edit_history_item.show();
     sep_item.show();
     quit_item.show();
 
     right_menu.append(clear_item);
+    right_menu.append(edit_history_item);
     right_menu.append(sep_item);
     right_menu.append(quit_item);
 
