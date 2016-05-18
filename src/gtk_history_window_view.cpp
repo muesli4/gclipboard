@@ -70,7 +70,15 @@ gtk_history_window_view::~gtk_history_window_view()
 
 void gtk_history_window_view::on_move_front(unsigned int id)
 {
-    // TODO implement
+    auto cs = _list_store_ref->children();
+
+    auto it = find_id(id);
+
+    if (it != cs.end())
+    {
+        _list_store_ref->iter_swap(it, cs.begin());
+    }
+
 }
 
 void gtk_history_window_view::on_select_active(unsigned int id)
