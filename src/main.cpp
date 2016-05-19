@@ -2,6 +2,7 @@
 #include <gtkmm/application.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/separatormenuitem.h>
+#include <gtkmm/aboutdialog.h>
 
 #include "default_clipboard_controller.hpp"
 #include "gtk_clipboard_model.hpp"
@@ -16,6 +17,8 @@
 // TODO save session
 // TODO publish initial changes to view from model
 
+char const * const icon_name = "edit-paste";
+
 int main(int argc, char ** argv)
 {
     setlocale(LC_ALL, "");
@@ -23,7 +26,7 @@ int main(int argc, char ** argv)
     textdomain(PACKAGE);
 
     auto app_ref = Gtk::Application::create(argc, argv, "org.gclipboard");
-    auto status_icon_ref = Gtk::StatusIcon::create("edit-paste");
+    auto status_icon_ref = Gtk::StatusIcon::create(icon_name);
 
     // a clipboard model which uses the tools provided by Gtkmm
     gtk_clipboard_model m(10);
@@ -40,6 +43,16 @@ int main(int argc, char ** argv)
     m.add_view(left_menu);
     m.add_view(history_window);
 
+    Gtk::AboutDialog about_dialog;
+    about_dialog.set_program_name(PACKAGE);
+    about_dialog.set_version(PACKAGE_VERSION);
+    about_dialog.set_logo_icon_name(icon_name);
+    about_dialog.set_comments(gettext("A simplistic clipboard manager."));
+    about_dialog.set_copyright("Copyright © 2016 Moritz Bruder");
+    about_dialog.set_icon_name(icon_name);
+    //about_dialog.set_transient_for(history_window);
+    // TODO finish
+
     // right click menu
     Gtk::Menu right_menu;
     Gtk::MenuItem clear_item(gettext("Clear"));
@@ -52,6 +65,7 @@ int main(int argc, char ** argv)
 
     clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
     edit_history_item.signal_activate().connect([&](){ history_window.show(); });
+    about_item.signal_activate().connect([&](){ about_dialog.run(); about_dialog.hide(); });
     quit_item.signal_activate().connect([app_ref](){ app_ref->release(); });
 
     right_menu.append(clear_item);

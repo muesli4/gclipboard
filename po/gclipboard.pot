@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gclipboard 0.1.0\n"
 "Report-Msgid-Bugs-To: muesli4@gmail.com\n"
-"POT-Creation-Date: 2016-05-18 23:25+0200\n"
+"POT-Creation-Date: 2016-05-19 19:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,27 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.cpp:45
+#: src/main.cpp:50
+msgid "A simplistic clipboard manager."
+msgstr ""
+
+#: src/main.cpp:58
 msgid "Clear"
 msgstr ""
 
-#: src/main.cpp:46
+#: src/main.cpp:59
 msgid "Edit history"
 msgstr ""
 
-#: src/main.cpp:48
+#: src/main.cpp:61
 msgid "Settings"
 msgstr ""
 
-#: src/main.cpp:49
+#: src/main.cpp:62
 msgid "About"
 msgstr ""
 
-#: src/main.cpp:51
+#: src/main.cpp:64
 msgid "Quit"
 msgstr ""
 
@@ -41,18 +45,30 @@ msgstr ""
 msgid "Empty"
 msgstr ""
 
-#: src/gtk_history_window_view.cpp:7
+#: src/gtk_history_window_view.cpp:10
 msgid "Remove selected"
 msgstr ""
 
-#: src/gtk_history_window_view.cpp:8
+#: src/gtk_history_window_view.cpp:11
 msgid "Remove all"
 msgstr ""
 
-#: src/gtk_history_window_view.cpp:16
+#: src/gtk_history_window_view.cpp:12
+msgid "Edit"
+msgstr ""
+
+#: src/gtk_history_window_view.cpp:21
 msgid "History"
 msgstr ""
 
-#: src/gtk_history_window_view.cpp:31
+#: src/gtk_history_window_view.cpp:37
 msgid "Entries"
+msgstr ""
+
+#: src/gtk_edit_entry_dialog.cpp:28
+msgid "Apply"
+msgstr ""
+
+#: src/gtk_edit_entry_dialog.cpp:29
+msgid "Cancel"
 msgstr ""

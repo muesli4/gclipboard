@@ -5,7 +5,6 @@
 
 #include <iostream>
 
-// TODO for some reason firefox sends multiple clipboard events and gtk3 applications send also one on selection loss ? solutions ?
 gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     : _text_buffer(buffer_size)
     , _active_valid(false)
@@ -14,6 +13,7 @@ gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     , _clipboard_ref(Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD))
     , _ignore_clipboard(false)
     , _last_time() // TODO sensible initial value
+    , _frozen(false)
 {
     _primary_con = _primary_ref->signal_owner_change().connect(
         [&](GdkEventOwnerChange * e)
@@ -32,50 +32,53 @@ gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
 
 void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, bool & ignore_source, Glib::RefPtr<Gtk::Clipboard> source_ref, bool & ignore_other, Glib::RefPtr<Gtk::Clipboard> other_ref)
 {
-    std::unique_lock<std::mutex> lock(_owner_change_mutex, std::defer_lock);
-    bool locked = lock.try_lock();
-    bool remove_ignore = false;
-
-    if (locked)
+    if (!_frozen)
     {
-        // ignore active or time between events too short
-        if (e->time - _last_time < 40 || ignore_source)
+        std::unique_lock<std::mutex> lock(_owner_change_mutex, std::defer_lock);
+        bool locked = lock.try_lock();
+        bool remove_ignore = false;
+
+        if (locked)
+        {
+            // ignore active or time between events too short
+            if (e->time - _last_time < 40 || ignore_source)
+            {
+                remove_ignore = true;
+            }
+            else
+            {
+                auto text = source_ref->wait_for_text();
+
+                // sync with other clipboard
+                ignore_other = true;
+                other_ref->set_text(text);
+
+                // add to internal buffer
+                if (_text_buffer.full())
+                {
+                    emit_remove_oldest();
+                }
+                unsigned int id = fresh_id();
+                _text_buffer.push_front(std::make_pair(text, id));
+
+                // notify views about new text
+                emit_add(text, id);
+
+                // update which entries should be selected
+                update_active_id(id);
+            }
+            _last_time = e->time;
+        }
+        // gtk somehow started both event handlers in parallel
+        else
         {
             remove_ignore = true;
         }
-        else
+
+        if (remove_ignore)
         {
-            auto text = source_ref->wait_for_text();
-
-            // sync with other clipboard
-            ignore_other = true;
-            other_ref->set_text(text);
-
-            // add to internal buffer
-            if (_text_buffer.full())
-            {
-                emit_remove_oldest();
-            }
-            unsigned int id = fresh_id();
-            _text_buffer.push_front(std::make_pair(text, id));
-
-            // notify views about new text
-            emit_add(text, id);
-
-            // update which entries should be selected
-            update_active_id(id);
+            ignore_source = false;
         }
-        _last_time = e->time;
-    }
-    // gtk somehow started both event handlers in parallel
-    else
-    {
-        remove_ignore = true;
-    }
-
-    if (remove_ignore)
-    {
-        ignore_source = false;
     }
 }
 
@@ -140,6 +143,26 @@ void gtk_clipboard_model::remove(unsigned int id)
             emit_select_active(_active_id);
         }
     }
+}
+
+void gtk_clipboard_model::change(unsigned int id, std::string const & s)
+{
+    auto it = find_id(id);
+    if (it != _text_buffer.end())
+    {
+        it->first = s;
+        emit_change(id, s);
+    }
+}
+
+void gtk_clipboard_model::freeze()
+{
+    _frozen = true;
+}
+
+void gtk_clipboard_model::thaw()
+{
+    _frozen = false;
 }
 
 gtk_clipboard_model::iterator gtk_clipboard_model::find_id(unsigned int id)

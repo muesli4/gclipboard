@@ -25,6 +25,9 @@ struct clipboard_view
 
     // the oldest entry has been dropped from the clipboard
     virtual void on_remove_oldest() = 0;
+
+    // an entry has been modified
+    virtual void on_change(unsigned int id, std::string const & s) = 0;
 };
 
 #endif

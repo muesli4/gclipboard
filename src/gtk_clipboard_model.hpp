@@ -14,6 +14,9 @@ struct gtk_clipboard_model : clipboard_model
     void clear();
     void select_active(unsigned int id);
     void remove(unsigned int id);
+    void change(unsigned int id, std::string const & s);
+    void freeze();
+    void thaw();
 
     ~gtk_clipboard_model();
 
@@ -52,6 +55,8 @@ struct gtk_clipboard_model : clipboard_model
     guint32 _last_time;
 
     std::mutex _owner_change_mutex;
+
+    bool _frozen;
 };
 
 

@@ -13,6 +13,9 @@ struct default_clipboard_controller : clipboard_controller
     void clipboard_clear();
     void clipboard_select_active(unsigned int id);
     void clipboard_remove(unsigned int id);
+    void clipboard_change(unsigned int id, std::string const & s);
+    void clipboard_freeze();
+    void clipboard_thaw();
 
     private:
     clipboard_model & _m;

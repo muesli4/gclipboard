@@ -22,6 +22,7 @@ struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
     void on_add(std::string const & s, unsigned int id);
     void on_remove(unsigned int id);
     void on_remove_oldest();
+    void on_change(unsigned int id, std::string const & s);
 
     private:
 
@@ -30,6 +31,9 @@ struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
 
     // TODO factor out into utilities
     static void set_pango_options_to_label(Gtk::MenuItem & mi);
+    bool has_bold_weight(Gtk::MenuItem & mi);
+    static void set_bold_weight(Gtk::MenuItem & mi);
+    static void set_normal_weight(Gtk::MenuItem & mi);
 
     void hide_empty_indicator();
     void show_empty_indicator();

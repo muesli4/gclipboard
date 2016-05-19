@@ -1,13 +1,18 @@
 #include "gtk_history_window_view.hpp"
+#include "gtk_edit_entry_dialog.hpp"
 #include "util.hpp"
 #include "gettext.h"
+
+#include <iostream>
 
 gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     : Gtk::Window()
     , _remove_selected_button(gettext("Remove selected"))
     , _remove_all_button(gettext("Remove all"))
+    , _edit_button(gettext("Edit"))
     , _column_record()
     , _entry_column()
+    , _plain_entry_column()
     , _id_column()
     , _list_view_text(0)
     , _ctrl(ctrl)
@@ -18,6 +23,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     this->set_default_size(700, 500);
 
     _column_record.add(_entry_column);
+    _column_record.add(_plain_entry_column);
     _column_record.add(_id_column);
     _list_store_ref = Gtk::ListStore::create(_column_record);
 
@@ -30,12 +36,23 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
 
     _list_view_text.append_column(gettext("Entries"), _entry_column);
 
+    auto selection_ref = _list_view_text.get_selection();
+    selection_ref->signal_changed().connect(
+        [&, selection_ref]()
+        {
+            bool sensitive = selection_ref->count_selected_rows() != 0;
+            _remove_selected_button.set_sensitive(sensitive);
+            _edit_button.set_sensitive(sensitive);
+        }
+    );
+
     _scrolled_window.add(_list_view_text);
     
     _vbox.pack_start(_scrolled_window, true, true);
 
     // controls
     _remove_all_button.signal_released().connect([&](){ _ctrl.clipboard_clear(); });
+    _remove_selected_button.set_sensitive(false);
     _remove_selected_button.signal_released().connect(
         [&]()
         {
@@ -53,9 +70,49 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
                 _ctrl.clipboard_remove(id);
         }
     );
+    _edit_button.set_sensitive(false);
+    _edit_button.signal_released().connect(
+        [&]()
+        {
+            std::vector<std::pair<std::string, unsigned int>> entries;
+
+            // prevent clipboard from changing while we edit it
+            _ctrl.clipboard_freeze();
+
+            _list_view_text.get_selection()->selected_foreach_iter(
+                [&](Gtk::TreeModel::iterator const & it)
+                {
+                    // note: rows cannot be removed from here
+                    auto & row = *it;
+                    entries.emplace_back(std::make_pair(row[_plain_entry_column], row[_id_column]));
+                }
+            );
+
+            if (!entries.empty())
+            {
+                gtk_edit_entry_dialog dialog(entries);
+                dialog.set_transient_for(*this);
+                dialog.set_modal();
+                int response = dialog.run();
+
+                if (response == Gtk::RESPONSE_APPLY)
+                {
+                    auto changes = dialog.get_changes();
+                    for (auto p : changes)
+                    {
+                        // TODO what if clipboard changes? freeze it manually?
+                        ctrl.clipboard_change(p.second, p.first);
+                    }
+                }
+            }
+
+            _ctrl.clipboard_thaw();
+        }
+    );
 
     _button_box.pack_start(_remove_selected_button);
-    _button_box.pack_end(_remove_all_button);
+    _button_box.pack_start(_remove_all_button);
+    _button_box.pack_end(_edit_button);
 
     _vbox.pack_end(_button_box, false, false);
 
@@ -97,6 +154,7 @@ void gtk_history_window_view::on_add(std::string const & s, unsigned int id)
 {
     auto row = *_list_store_ref->prepend();
     row[_entry_column] = replace_special_whitespace_characters(s);
+    row[_plain_entry_column] = s;
     row[_id_column] = id;
 }
 
@@ -114,6 +172,26 @@ void gtk_history_window_view::on_remove(unsigned int id)
 
 void gtk_history_window_view::on_remove_oldest()
 {
+    auto cs = _list_store_ref->children();
+
+    if (!cs.empty())
+    {
+        _list_store_ref->erase(cs.rbegin().base());
+    }
+}
+
+void gtk_history_window_view::on_change(unsigned int id, std::string const & s)
+{
+    auto cs = _list_store_ref->children();
+
+    auto it = find_id(id);
+
+    if (it != cs.end())
+    {
+        auto & row = *it;
+        row[_plain_entry_column] = s;
+        row[_entry_column] = replace_special_whitespace_characters(s);
+    }
 }
 
 Gtk::ListStore::iterator gtk_history_window_view::find_id(unsigned int id)

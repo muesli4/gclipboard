@@ -20,3 +20,18 @@ void default_clipboard_controller::clipboard_remove(unsigned int id)
     _m.remove(id);
 }
 
+void default_clipboard_controller::clipboard_change(unsigned int id, std::string const & s)
+{
+    _m.change(id, s);
+}
+
+void default_clipboard_controller::clipboard_freeze()
+{
+    _m.freeze();
+}
+
+void default_clipboard_controller::clipboard_thaw()
+{
+    _m.thaw();
+}
+

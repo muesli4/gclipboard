@@ -72,6 +72,12 @@ void clipboard_model::emit_remove_oldest()
         ptr->on_remove_oldest();
 }
 
+void clipboard_model::emit_change(unsigned int id, std::string const & s)
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_change(id, s);
+}
+
 unsigned int clipboard_model::fresh_id()
 {
     auto id = _id_src;
