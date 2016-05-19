@@ -3,6 +3,7 @@
 
 #include <boost/circular_buffer.hpp>
 #include <gtkmm/clipboard.h>
+#include <mutex>
 
 #include "clipboard_model.hpp"
 
@@ -47,6 +48,10 @@ struct gtk_clipboard_model : clipboard_model
     Glib::RefPtr<Gtk::Clipboard> _clipboard_ref;
     sigc::connection _clipboard_con;
     bool _ignore_clipboard;
+
+    guint32 _last_time;
+
+    std::mutex _owner_change_mutex;
 };
 
 
