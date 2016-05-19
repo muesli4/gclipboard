@@ -16,6 +16,11 @@
 // TODO settings
 // TODO save session
 // TODO search history
+// TODO add duplicate entries?
+// TODO add unicode symbols in lines to show special whitespace characters:
+//         ␣ for space
+//         ↵ for newline
+//         ↹ for tab
 
 char const * const icon_name = "edit-paste";
 

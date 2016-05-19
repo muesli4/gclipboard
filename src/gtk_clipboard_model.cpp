@@ -3,8 +3,6 @@
 #include <utility>
 #include <iterator>
 
-#include <iostream>
-
 gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     : _text_buffer(buffer_size)
     , _active_valid(false)
@@ -47,6 +45,8 @@ void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, bool & ig
             }
             else
             {
+                // note: this call will yield and may execute other code while
+                // it is suspended
                 auto text = source_ref->wait_for_text();
 
                 // sync with other clipboard
@@ -157,6 +157,9 @@ void gtk_clipboard_model::change(unsigned int id, std::string const & s)
 
 void gtk_clipboard_model::freeze()
 {
+    // aquire the mutex to ensure that no more more updates are happening to
+    // the clipboard
+    std::lock_guard<std::mutex> lock(_owner_change_mutex);
     _frozen = true;
 }
 

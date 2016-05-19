@@ -30,8 +30,9 @@ struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
     typedef buffer_type::iterator buffer_iterator;
 
     // TODO factor out into utilities
+    static std::string prepare_label_text(std::string s);
     static void set_pango_options_to_label(Gtk::MenuItem & mi);
-    bool has_bold_weight(Gtk::MenuItem & mi);
+    static bool has_bold_weight(Gtk::MenuItem & mi);
     static void set_bold_weight(Gtk::MenuItem & mi);
     static void set_normal_weight(Gtk::MenuItem & mi);
 

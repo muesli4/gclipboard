@@ -72,7 +72,7 @@ void gtk_left_menu_view::on_add(std::string const & s, unsigned int id)
 
     // TODO trim string to length and replace newlines
     _menu_items.emplace_front(
-        std::make_pair( Glib::Markup::escape_text(replace_special_whitespace_characters(s))
+        std::make_pair( prepare_label_text(s)
                       , id
                       )
     );
@@ -126,7 +126,7 @@ void gtk_left_menu_view::on_change(unsigned int id, std::string const & s)
         auto & mi = it->first;
         bool make_bold = has_bold_weight(mi);
         // TODO check for bold ?
-        mi.set_label(Glib::Markup::escape_text(replace_special_whitespace_characters(s)));
+        mi.set_label(prepare_label_text(s));
 
         if (make_bold)
             set_bold_weight(mi);
@@ -142,6 +142,12 @@ void gtk_left_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
         l->set_ellipsize(Pango::ELLIPSIZE_END);
         l->set_max_width_chars(40);
     }
+}
+
+
+std::string gtk_left_menu_view::prepare_label_text(std::string s)
+{
+    return Glib::Markup::escape_text(replace_special_whitespace_characters(s));
 }
 
 bool gtk_left_menu_view::has_bold_weight(Gtk::MenuItem & mi)
