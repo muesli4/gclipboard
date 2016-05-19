@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gclipboard 0.1.0\n"
 "Report-Msgid-Bugs-To: muesli4@gmail.com\n"
-"POT-Creation-Date: 2016-05-19 19:14+0200\n"
+"POT-Creation-Date: 2016-05-19 21:21+0200\n"
 "PO-Revision-Date: 2016-05-18 22:11+0200\n"
 "Last-Translator:  <muesli4@googlemail.com>\n"
 "Language-Team: German\n"
@@ -17,58 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/main.cpp:50
+#: src/main.cpp:51
 msgid "A simplistic clipboard manager."
 msgstr "Ein simplistischer Zwischenablagenverwalter."
-
-#: src/main.cpp:58
-msgid "Clear"
-msgstr "Leeren"
-
-#: src/main.cpp:59
-msgid "Edit history"
-msgstr "Verlauf bearbeiten"
-
-#: src/main.cpp:61
-msgid "Settings"
-msgstr "Einstellungen"
-
-#: src/main.cpp:62
-msgid "About"
-msgstr "Über"
-
-#: src/main.cpp:64
-msgid "Quit"
-msgstr "Beenden"
 
 #: src/gtk_left_menu_view.cpp:12
 msgid "Empty"
 msgstr "Leer"
 
-#: src/gtk_history_window_view.cpp:10
-msgid "Remove selected"
-msgstr "Ausgewählte entfernen"
-
-#: src/gtk_history_window_view.cpp:11
-msgid "Remove all"
-msgstr "Alle entfernen"
-
-#: src/gtk_history_window_view.cpp:12
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: src/gtk_history_window_view.cpp:21
+#: src/gtk_history_window_view.cpp:16
 msgid "History"
 msgstr "Verlauf"
-
-#: src/gtk_history_window_view.cpp:37
-msgid "Entries"
-msgstr "Einträge"
-
-#: src/gtk_edit_entry_dialog.cpp:28
-msgid "Apply"
-msgstr "Anwenden"
-
-#: src/gtk_edit_entry_dialog.cpp:29
-msgid "Cancel"
-msgstr "Abbrechen"

@@ -1,8 +1,10 @@
 #include <gtkmm/statusicon.h>
 #include <gtkmm/application.h>
 #include <gtkmm/menu.h>
+#include <gtkmm/imagemenuitem.h>
 #include <gtkmm/separatormenuitem.h>
 #include <gtkmm/aboutdialog.h>
+#include <gtkmm/stock.h>
 
 #include "default_clipboard_controller.hpp"
 #include "gtk_clipboard_model.hpp"
@@ -54,13 +56,13 @@ int main(int argc, char ** argv)
 
     // right click menu
     Gtk::Menu right_menu;
-    Gtk::MenuItem clear_item(gettext("Clear"));
-    Gtk::MenuItem edit_history_item(gettext("Edit history"));
+    Gtk::ImageMenuItem clear_item(Gtk::Stock::CLEAR);
+    Gtk::ImageMenuItem edit_history_item(Gtk::Stock::EDIT);
     Gtk::SeparatorMenuItem sep_item;
-    Gtk::MenuItem settings_item(gettext("Settings"));
-    Gtk::MenuItem about_item(gettext("About"));
+    Gtk::ImageMenuItem settings_item(Gtk::Stock::PREFERENCES);
+    Gtk::ImageMenuItem about_item(Gtk::Stock::ABOUT);
     Gtk::SeparatorMenuItem sep2_item;
-    Gtk::MenuItem quit_item(gettext("Quit"));
+    Gtk::ImageMenuItem quit_item(Gtk::Stock::QUIT);
 
     clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
     edit_history_item.signal_activate().connect([&](){ history_window.show(); });

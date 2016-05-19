@@ -1,15 +1,14 @@
+#include <gtkmm/stock.h>
 #include "gtk_history_window_view.hpp"
 #include "gtk_edit_entry_dialog.hpp"
 #include "util.hpp"
 #include "gettext.h"
 
-#include <iostream>
-
 gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     : Gtk::Window()
-    , _remove_selected_button(gettext("Remove selected"))
-    , _remove_all_button(gettext("Remove all"))
-    , _edit_button(gettext("Edit"))
+    , _remove_selected_button(Gtk::Stock::REMOVE)
+    , _remove_all_button(Gtk::Stock::CLEAR)
+    , _edit_button(Gtk::Stock::EDIT)
     , _list_view_text(0)
     , _ctrl(ctrl)
 
@@ -27,7 +26,8 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     // TODO make scrollbar decrease again
     //_list_view_text.set_hscroll_policy(Gtk::SCROLL_MINIMUM);
 
-    _list_view_text.append_column(gettext("Entries"), _column_record.entry_column);
+    _list_view_text.set_headers_visible(false);
+    _list_view_text.append_column("", _column_record.entry_column);
 
     auto selection_ref = _list_view_text.get_selection();
     selection_ref->signal_changed().connect(
@@ -41,7 +41,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
 
     _scrolled_window.add(_list_view_text);
     
-    _vbox.pack_start(_scrolled_window, true, true);
+    _vbox.pack_start(_scrolled_window, true, true, 5);
 
     // controls
     _remove_all_button.signal_released().connect([&](){ _ctrl.clipboard_clear(); });
@@ -103,15 +103,16 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
         }
     );
 
-    _button_box.pack_start(_remove_selected_button);
-    _button_box.pack_start(_remove_all_button);
-    _button_box.pack_end(_edit_button);
+    _button_box.pack_start(_edit_button, true, true, 1);
+    _button_box.pack_start(_remove_selected_button, true, true, 1);
+    _button_box.pack_start(_remove_all_button, true, true, 1);
 
-    _vbox.pack_end(_button_box, false, false);
+    _vbox.pack_end(_button_box, false, false, 1);
 
     _vbox.show_all();
 
     this->add(_vbox);
+    this->set_border_width(2);
 }
 
 gtk_history_window_view::~gtk_history_window_view()
@@ -169,7 +170,9 @@ void gtk_history_window_view::on_remove_oldest()
 
     if (!cs.empty())
     {
-        _list_store_ref->erase(cs.rbegin().base());
+        auto it = cs.end();
+        it--;
+        _list_store_ref->erase(it);
     }
 }
 

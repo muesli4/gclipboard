@@ -1,3 +1,5 @@
+#include <gtkmm/stock.h>
+
 #include "gtk_edit_entry_dialog.hpp"
 #include "gettext.h"
 
@@ -26,8 +28,8 @@ gtk_edit_entry_dialog::gtk_edit_entry_dialog(std::vector<std::pair<std::string, 
         vbox_ptr->pack_end(row_box, true, true, 10);
     }
     vbox_ptr->show_all();
-    this->add_button(gettext("Apply"), Gtk::RESPONSE_APPLY)->set_image_from_icon_name("dialog-apply");
-    this->add_button(gettext("Cancel"), Gtk::RESPONSE_CANCEL)->set_image_from_icon_name("dialog-cancel");
+    this->add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
+    this->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 }
 
 std::vector<std::pair<std::string, unsigned int>> gtk_edit_entry_dialog::get_changes()
