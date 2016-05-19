@@ -10,10 +10,6 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     , _remove_selected_button(gettext("Remove selected"))
     , _remove_all_button(gettext("Remove all"))
     , _edit_button(gettext("Edit"))
-    , _column_record()
-    , _entry_column()
-    , _plain_entry_column()
-    , _id_column()
     , _list_view_text(0)
     , _ctrl(ctrl)
 
@@ -22,9 +18,6 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     this->set_icon_name("edit-paste");
     this->set_default_size(700, 500);
 
-    _column_record.add(_entry_column);
-    _column_record.add(_plain_entry_column);
-    _column_record.add(_id_column);
     _list_store_ref = Gtk::ListStore::create(_column_record);
 
     _scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -34,7 +27,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     // TODO make scrollbar decrease again
     //_list_view_text.set_hscroll_policy(Gtk::SCROLL_MINIMUM);
 
-    _list_view_text.append_column(gettext("Entries"), _entry_column);
+    _list_view_text.append_column(gettext("Entries"), _column_record.entry_column);
 
     auto selection_ref = _list_view_text.get_selection();
     selection_ref->signal_changed().connect(
@@ -62,7 +55,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
                 [&](Gtk::TreeModel::iterator const & it)
                 {
                     // note: rows cannot be removed from here
-                    ids.push_back((*it)[_id_column]);
+                    ids.push_back((*it)[_column_record.id_column]);
                 }
             );
 
@@ -84,7 +77,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
                 {
                     // note: rows cannot be removed from here
                     auto & row = *it;
-                    entries.emplace_back(std::make_pair(row[_plain_entry_column], row[_id_column]));
+                    entries.emplace_back(std::make_pair(row[_column_record.plain_entry_column], row[_column_record.id_column]));
                 }
             );
 
@@ -153,9 +146,9 @@ void gtk_history_window_view::on_clear()
 void gtk_history_window_view::on_add(std::string const & s, unsigned int id)
 {
     auto row = *_list_store_ref->prepend();
-    row[_entry_column] = replace_special_whitespace_characters(s);
-    row[_plain_entry_column] = s;
-    row[_id_column] = id;
+    row[_column_record.entry_column] = replace_special_whitespace_characters(s);
+    row[_column_record.plain_entry_column] = s;
+    row[_column_record.id_column] = id;
 }
 
 void gtk_history_window_view::on_remove(unsigned int id)
@@ -189,14 +182,21 @@ void gtk_history_window_view::on_change(unsigned int id, std::string const & s)
     if (it != cs.end())
     {
         auto & row = *it;
-        row[_plain_entry_column] = s;
-        row[_entry_column] = replace_special_whitespace_characters(s);
+        row[_column_record.plain_entry_column] = s;
+        row[_column_record.entry_column] = replace_special_whitespace_characters(s);
     }
+}
+
+gtk_history_window_view::history_model_column_record::history_model_column_record()
+{
+    add(entry_column);
+    add(plain_entry_column);
+    add(id_column);
 }
 
 Gtk::ListStore::iterator gtk_history_window_view::find_id(unsigned int id)
 {
     auto cs = _list_store_ref->children();
 
-    return std::find_if(cs.begin(), cs.end(), [&](Gtk::TreeRow const & r){ return r[_id_column] == id; });
+    return std::find_if(cs.begin(), cs.end(), [&](Gtk::TreeRow const & r){ return r[_column_record.id_column] == id; });
 }

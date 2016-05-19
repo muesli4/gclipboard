@@ -37,12 +37,17 @@ struct gtk_history_window_view : public Gtk::Window, clipboard_view
     Gtk::Button _edit_button;
 
     Gtk::ScrolledWindow _scrolled_window;
+
     // the gtk model
-    Gtk::TreeModelColumnRecord _column_record;
-    Gtk::TreeModelColumn<std::string> _entry_column;
-    // TODO can this be changed via cell renderer?
-    Gtk::TreeModelColumn<std::string> _plain_entry_column;
-    Gtk::TreeModelColumn<unsigned int> _id_column;
+    struct history_model_column_record : Gtk::TreeModelColumnRecord
+    {
+        history_model_column_record();
+        Gtk::TreeModelColumn<std::string> entry_column;
+        Gtk::TreeModelColumn<std::string> plain_entry_column;
+        Gtk::TreeModelColumn<unsigned int> id_column;
+    };
+
+    history_model_column_record _column_record;
 
     Glib::RefPtr<Gtk::ListStore> _list_store_ref;
 

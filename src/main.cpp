@@ -12,15 +12,14 @@
 #include "gettext.h"
 
 // TODO settings
-// TODO about dialog
-// TODO manage contents
 // TODO save session
-// TODO publish initial changes to view from model
+// TODO search history
 
 char const * const icon_name = "edit-paste";
 
 int main(int argc, char ** argv)
 {
+    // setup localization
     setlocale(LC_ALL, "");
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
