@@ -26,7 +26,7 @@ struct gtk_clipboard_model : clipboard_model
 
     private:
 
-    void handle_owner_change(GdkEventOwnerChange * e, bool & ignore_source, Glib::RefPtr<Gtk::Clipboard> source, bool & ignore_other, Glib::RefPtr<Gtk::Clipboard> other);
+    void handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source, Glib::RefPtr<Gtk::Clipboard> other);
 
     void update_active_id(unsigned int id);
 
@@ -45,12 +45,10 @@ struct gtk_clipboard_model : clipboard_model
     // clipboard used for mouse selection
     Glib::RefPtr<Gtk::Clipboard> _primary_ref;
     sigc::connection _primary_con;
-    bool _ignore_primary;
 
     // clipboard used for keyboard based selection
     Glib::RefPtr<Gtk::Clipboard> _clipboard_ref;
     sigc::connection _clipboard_con;
-    bool _ignore_clipboard;
 
     guint32 _last_time;
 

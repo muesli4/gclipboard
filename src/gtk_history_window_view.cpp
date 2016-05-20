@@ -6,9 +6,10 @@
 
 gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     : Gtk::Window()
-    , _remove_selected_button(Gtk::Stock::REMOVE)
-    , _remove_all_button(Gtk::Stock::CLEAR)
+    , _remove_button(Gtk::Stock::REMOVE)
+    , _clear_button(Gtk::Stock::CLEAR)
     , _edit_button(Gtk::Stock::EDIT)
+    , _close_button(Gtk::Stock::CLOSE)
     , _list_view_text(0)
     , _ctrl(ctrl)
 
@@ -16,11 +17,30 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     this->set_title(gettext("History"));
     this->set_icon_name("edit-paste");
     this->set_default_size(700, 500);
+    this->set_position(Gtk::WIN_POS_CENTER_ALWAYS);
+
+    _search_entry.signal_search_changed().connect(
+        [&]()
+        {
+            _filter_string = _search_entry.get_text().lowercase();
+            _filter_model_ref->refilter();
+        }
+    );
+    _vbox.pack_start(_search_entry, false, false, 2);
 
     _list_store_ref = Gtk::ListStore::create(_column_record);
 
+    _filter_model_ref = Gtk::TreeModelFilter::create(_list_store_ref);
+    _filter_model_ref->set_visible_func(
+        [&](Gtk::TreeModel::const_iterator const & it)
+        {
+            Glib::ustring target = Glib::ustring((*it)[_column_record.plain_entry_column]);
+            return target.lowercase().find(_filter_string) != Glib::ustring::npos;
+        }
+    );
+
     _scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    _list_view_text.set_model(_list_store_ref);
+    _list_view_text.set_model(_filter_model_ref);
     _list_view_text.get_selection()->set_mode(Gtk::SELECTION_MULTIPLE);
 
     // TODO make scrollbar decrease again
@@ -28,25 +48,27 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
 
     _list_view_text.set_headers_visible(false);
     _list_view_text.append_column("", _column_record.entry_column);
+    // TODO use this instead of scrolling?
+    // dynamic_cast<Gtk::CellRendererText *>(_list_view_text.get_column_cell_renderer(0))->property_ellipsize() = Pango::ELLIPSIZE_END;
 
     auto selection_ref = _list_view_text.get_selection();
     selection_ref->signal_changed().connect(
         [&, selection_ref]()
         {
             bool sensitive = selection_ref->count_selected_rows() != 0;
-            _remove_selected_button.set_sensitive(sensitive);
+            _remove_button.set_sensitive(sensitive);
             _edit_button.set_sensitive(sensitive);
         }
     );
 
     _scrolled_window.add(_list_view_text);
     
-    _vbox.pack_start(_scrolled_window, true, true, 5);
+    _vbox.pack_start(_scrolled_window, true, true, 2);
 
     // controls
-    _remove_all_button.signal_released().connect([&](){ _ctrl.clipboard_clear(); });
-    _remove_selected_button.set_sensitive(false);
-    _remove_selected_button.signal_released().connect(
+    _clear_button.signal_released().connect([&](){ _ctrl.clipboard_clear(); });
+    _remove_button.set_sensitive(false);
+    _remove_button.signal_released().connect(
         [&]()
         {
             std::vector<unsigned int> ids;
@@ -102,10 +124,12 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
             _ctrl.clipboard_thaw();
         }
     );
+    _close_button.signal_released().connect([&](){ this->hide(); });
 
     _button_box.pack_start(_edit_button, true, true, 1);
-    _button_box.pack_start(_remove_selected_button, true, true, 1);
-    _button_box.pack_start(_remove_all_button, true, true, 1);
+    _button_box.pack_start(_remove_button, true, true, 1);
+    _button_box.pack_start(_clear_button, true, true, 1);
+    _button_box.pack_start(_close_button, true, true, 1);
 
     _vbox.pack_end(_button_box, false, false, 1);
 

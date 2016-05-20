@@ -1,15 +1,17 @@
 #ifndef GCLIPBOARD_GTK_HISTORY_WINDOW_VIEW_HPP
 #define GCLIPBOARD_GTK_HISTORY_WINDOW_VIEW_HPP
 
-#include <gtkmm/window.h>
 #include <gtkmm/button.h>
+#include <gtkmm/searchentry.h>
 #include <gtkmm/hvbox.h>
 #include <gtkmm/liststore.h>
-#include <gtkmm/scrolledwindow.h>
 #include <gtkmm/listviewtext.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/treemodelfilter.h>
+#include <gtkmm/window.h>
 
-#include "clipboard_view.hpp"
 #include "clipboard_controller.hpp"
+#include "clipboard_view.hpp"
 
 struct gtk_history_window_view : public Gtk::Window, clipboard_view
 {
@@ -32,11 +34,14 @@ struct gtk_history_window_view : public Gtk::Window, clipboard_view
 
     Gtk::VBox _vbox;
     Gtk::HBox _button_box;
-    Gtk::Button _remove_selected_button;
-    Gtk::Button _remove_all_button;
+    Gtk::Button _remove_button;
+    Gtk::Button _clear_button;
     Gtk::Button _edit_button;
+    Gtk::Button _close_button;
 
     Gtk::ScrolledWindow _scrolled_window;
+
+    Gtk::SearchEntry _search_entry;
 
     // the gtk model
     struct history_model_column_record : Gtk::TreeModelColumnRecord
@@ -51,9 +56,11 @@ struct gtk_history_window_view : public Gtk::Window, clipboard_view
 
     Glib::RefPtr<Gtk::ListStore> _list_store_ref;
 
+    Glib::RefPtr<Gtk::TreeModelFilter> _filter_model_ref;
+    Glib::ustring _filter_string;
+
     // the gtk view
     Gtk::ListViewText _list_view_text;
-
 
     clipboard_controller & _ctrl;
 };

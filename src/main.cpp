@@ -53,7 +53,7 @@ int main(int argc, char ** argv)
     about_dialog.set_program_name(PACKAGE);
     about_dialog.set_version(PACKAGE_VERSION);
     about_dialog.set_logo_icon_name(icon_name);
-    about_dialog.set_comments(gettext("A simplistic clipboard manager."));
+    about_dialog.set_comments(gettext("A clean and simple clipboard manager, which has been influenced by other popular clipboard managers."));
     about_dialog.set_copyright("Copyright © 2016 Moritz Bruder");
     about_dialog.set_icon_name(icon_name);
     //about_dialog.set_transient_for(history_window);

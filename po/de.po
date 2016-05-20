@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gclipboard 0.1.0\n"
 "Report-Msgid-Bugs-To: muesli4@gmail.com\n"
-"POT-Creation-Date: 2016-05-19 21:21+0200\n"
+"POT-Creation-Date: 2016-05-20 00:17+0200\n"
 "PO-Revision-Date: 2016-05-18 22:11+0200\n"
 "Last-Translator:  <muesli4@googlemail.com>\n"
 "Language-Team: German\n"
@@ -17,14 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/main.cpp:51
-msgid "A simplistic clipboard manager."
-msgstr "Ein simplistischer Zwischenablagenverwalter."
+#: src/main.cpp:56
+msgid ""
+"A clean and simple clipboard manager, which has been influenced by other "
+"popular clipboard managers."
+msgstr ""
+"Ein sauberer und einfacher Zwischenablagenverwalter, welcher von anderen "
+"populären Zwischenablagenverwaltern beeinflusst wurde."
 
 #: src/gtk_left_menu_view.cpp:12
 msgid "Empty"
 msgstr "Leer"
 
-#: src/gtk_history_window_view.cpp:16
+#: src/gtk_history_window_view.cpp:17
 msgid "History"
 msgstr "Verlauf"
