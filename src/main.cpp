@@ -118,7 +118,7 @@ int main(int argc, char ** argv)
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
 
-    auto app_ref = Gtk::Application::create(argc, argv, "org.gclipboard");
+    auto app_ref = Gtk::Application::create(argc, argv, "com.github.muesli4.gclipboard");
 
     app_ref->register_application();
 
@@ -127,7 +127,8 @@ int main(int argc, char ** argv)
     {
         auto status_icon_ref = Gtk::StatusIcon::create(icon_name);
 
-        // a clipboard model which uses the tools provided by Gtkmm
+        // a clipboard model which uses the Gtk::Clipboard class provided by
+        // Gtkmm to manage both clipboards
         gtk_clipboard_model m(10);
 
         default_clipboard_controller ctrl(m);

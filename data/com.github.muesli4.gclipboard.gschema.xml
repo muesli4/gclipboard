@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<schemalist>
+    <schema path="/com/github/muesli4/gclipboard/" id="com.github.muesli4.gclipboard">
+        <key name='history-size' type='i'>
+            <default>10</default>
+            <summary>The size of the history</summary>
+            <description>
+                Describes how much entries fit into the history until another entry
+                has to be dropped to make space for a new one.
+            </description>
+            <range min='1' max='100000' />
+        </key>
+    </schema>
+</schemalist>
+
