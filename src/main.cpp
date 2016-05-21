@@ -119,77 +119,84 @@ int main(int argc, char ** argv)
     textdomain(PACKAGE);
 
     auto app_ref = Gtk::Application::create(argc, argv, "org.gclipboard");
-    auto status_icon_ref = Gtk::StatusIcon::create(icon_name);
 
-    // a clipboard model which uses the tools provided by Gtkmm
-    gtk_clipboard_model m(10);
+    app_ref->register_application();
 
-    default_clipboard_controller ctrl(m);
+    // allow only one instance
+    if (!app_ref->is_remote())
+    {
+        auto status_icon_ref = Gtk::StatusIcon::create(icon_name);
 
-    // left click menu
-    gtk_history_menu_view history_menu(ctrl);
+        // a clipboard model which uses the tools provided by Gtkmm
+        gtk_clipboard_model m(10);
 
-    // history window
-    gtk_history_window_view history_window(ctrl);
+        default_clipboard_controller ctrl(m);
 
-    // connect to model
-    m.add_view(history_menu);
-    m.add_view(history_window);
+        // left click menu
+        gtk_history_menu_view history_menu(ctrl);
 
-    Gtk::AboutDialog about_dialog;
-    about_dialog.set_program_name(PACKAGE);
-    about_dialog.set_version(PACKAGE_VERSION);
-    about_dialog.set_logo_icon_name(icon_name);
-    about_dialog.set_comments(gettext("A clean and simple clipboard manager, which has been influenced by other popular clipboard managers."));
-    about_dialog.set_copyright("Copyright © 2016 Moritz Bruder");
-    about_dialog.set_icon_name(icon_name);
-    //about_dialog.set_transient_for(history_window);
-    // TODO finish
+        // history window
+        gtk_history_window_view history_window(ctrl);
 
-    // right click menu
-    Gtk::Menu right_menu;
-    Gtk::ImageMenuItem clear_item(Gtk::Stock::CLEAR);
-    Gtk::ImageMenuItem edit_history_item(Gtk::Stock::EDIT);
-    enabled_menu_item_view enabled_item(gettext("Enable history"), ctrl);
-    Gtk::SeparatorMenuItem sep_item;
-    Gtk::ImageMenuItem settings_item(Gtk::Stock::PREFERENCES);
-    Gtk::ImageMenuItem about_item(Gtk::Stock::ABOUT);
-    Gtk::SeparatorMenuItem sep2_item;
-    Gtk::ImageMenuItem quit_item(Gtk::Stock::QUIT);
+        // connect to model
+        m.add_view(history_menu);
+        m.add_view(history_window);
 
-    clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
-    edit_history_item.signal_activate().connect([&](){ history_window.show(); });
-    m.add_view(enabled_item);
-    about_item.signal_activate().connect([&](){ about_dialog.run(); about_dialog.hide(); });
-    quit_item.signal_activate().connect([app_ref](){ app_ref->release(); });
+        Gtk::AboutDialog about_dialog;
+        about_dialog.set_program_name(PACKAGE);
+        about_dialog.set_version(PACKAGE_VERSION);
+        about_dialog.set_logo_icon_name(icon_name);
+        about_dialog.set_comments(gettext("A clean and simple clipboard manager, which has been influenced by other popular clipboard managers."));
+        about_dialog.set_copyright("Copyright © 2016 Moritz Bruder");
+        about_dialog.set_icon_name(icon_name);
+        //about_dialog.set_transient_for(history_window);
+        // TODO finish
 
-    right_menu.append(clear_item);
-    right_menu.append(edit_history_item);
-    right_menu.append(enabled_item);
-    right_menu.append(sep_item);
-    right_menu.append(settings_item);
-    right_menu.append(about_item);
-    right_menu.append(sep2_item);
-    right_menu.append(quit_item);
+        // right click menu
+        Gtk::Menu right_menu;
+        Gtk::ImageMenuItem clear_item(Gtk::Stock::CLEAR);
+        Gtk::ImageMenuItem edit_history_item(Gtk::Stock::EDIT);
+        enabled_menu_item_view enabled_item(gettext("Enable history"), ctrl);
+        Gtk::SeparatorMenuItem sep_item;
+        Gtk::ImageMenuItem settings_item(Gtk::Stock::PREFERENCES);
+        Gtk::ImageMenuItem about_item(Gtk::Stock::ABOUT);
+        Gtk::SeparatorMenuItem sep2_item;
+        Gtk::ImageMenuItem quit_item(Gtk::Stock::QUIT);
 
-    right_menu.show_all();
+        clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
+        edit_history_item.signal_activate().connect([&](){ history_window.show(); });
+        m.add_view(enabled_item);
+        about_item.signal_activate().connect([&](){ about_dialog.run(); about_dialog.hide(); });
+        quit_item.signal_activate().connect([app_ref](){ app_ref->release(); });
 
-    status_icon_ref->signal_button_press_event().connect(
-        [&, app_ref, status_icon_ref](GdkEventButton * e)
-        {
-            if (e->button == 1)
+        right_menu.append(clear_item);
+        right_menu.append(edit_history_item);
+        right_menu.append(enabled_item);
+        right_menu.append(sep_item);
+        right_menu.append(settings_item);
+        right_menu.append(about_item);
+        right_menu.append(sep2_item);
+        right_menu.append(quit_item);
+
+        right_menu.show_all();
+
+        status_icon_ref->signal_button_press_event().connect(
+            [&, app_ref, status_icon_ref](GdkEventButton * e)
             {
-                status_icon_ref->popup_menu_at_position(history_menu, 1, e->time);
+                if (e->button == 1)
+                {
+                    status_icon_ref->popup_menu_at_position(history_menu, 1, e->time);
+                }
+                else if (e->button == 3)
+                {
+                    status_icon_ref->popup_menu_at_position(right_menu, 3, e->time);
+                }
+                return true;
             }
-            else if (e->button == 3)
-            {
-                status_icon_ref->popup_menu_at_position(right_menu, 3, e->time);
-            }
-            return true;
-        }
-    );
+        );
 
-    app_ref->hold();
-    return app_ref->run(argc, argv);
+        app_ref->hold();
+        return app_ref->run(argc, argv);
+    }
 }
 
