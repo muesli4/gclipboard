@@ -168,6 +168,7 @@ int main(int argc, char ** argv)
                 app_ref->remove_window(about_dialog);
             }
         );
+        settings_item.set_sensitive(false);
         sigc::connection quit_con = quit_item.signal_activate().connect(
             [&]()
             {

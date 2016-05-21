@@ -6,6 +6,7 @@
 gtk_edit_entry_dialog::gtk_edit_entry_dialog(std::vector<std::pair<std::string, unsigned int>> const & es)
     : _buttons(es.size())
     , _text_views(es.size())
+    , _scrolled_windows(es.size())
     , _row_boxes(es.size())
 {
     auto vbox_ptr = this->get_vbox();
@@ -23,8 +24,9 @@ gtk_edit_entry_dialog::gtk_edit_entry_dialog(std::vector<std::pair<std::string, 
         
         auto & row_box = _row_boxes[n];
         row_box.pack_start(button, false, false, 10);
-        // TODO horizontally wrap in ScrolledWindow
-        row_box.pack_end(text_view, true, true);
+        auto & scrolled_window = _scrolled_windows[n];
+        scrolled_window.add(text_view);
+        row_box.pack_end(scrolled_window, true, true);
         vbox_ptr->pack_end(row_box, true, true, 10);
     }
     vbox_ptr->show_all();

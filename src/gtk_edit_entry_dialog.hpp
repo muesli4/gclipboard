@@ -1,13 +1,14 @@
 #ifndef GCLIPBOARD_GTK_EDIT_ENTRY_DIALOG_HPP
 #define GCLIPBOARD_GTK_EDIT_ENTRY_DIALOG_HPP
 
-#include <gtkmm/dialog.h>
 #include <gtkmm/checkbutton.h>
-#include <gtkmm/textview.h>
+#include <gtkmm/dialog.h>
 #include <gtkmm/hvbox.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/textview.h>
+
 #include <vector>
 #include <string>
-
 
 struct gtk_edit_entry_dialog : public Gtk::Dialog
 {
@@ -21,6 +22,7 @@ struct gtk_edit_entry_dialog : public Gtk::Dialog
 
     std::vector<Gtk::CheckButton> _buttons;
     std::vector<Gtk::TextView> _text_views;
+    std::vector<Gtk::ScrolledWindow> _scrolled_windows;
 
     std::vector<Gtk::HBox> _row_boxes;
 };
