@@ -22,8 +22,8 @@ struct clipboard_model
     virtual void remove(unsigned int id) = 0;
     virtual void change(unsigned int id, std::string const & s) = 0;
     // disallow modification of the clipboard
-    virtual void freeze() = 0;
-    virtual void thaw() = 0;
+    virtual void freeze(request_type rt) = 0;
+    virtual void thaw(request_type rt) = 0;
 
     virtual ~clipboard_model();
 
@@ -38,6 +38,8 @@ struct clipboard_model
     void emit_remove(unsigned int id);
     void emit_remove_oldest();
     void emit_change(unsigned int id, std::string const & s);
+    void emit_freeze(request_type rt);
+    void emit_thaw();
 
     // initialize a view with the current state of the model
     virtual void init_view(clipboard_view & v) = 0;

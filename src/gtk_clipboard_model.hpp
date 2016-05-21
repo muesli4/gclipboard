@@ -15,8 +15,8 @@ struct gtk_clipboard_model : clipboard_model
     void select_active(unsigned int id);
     void remove(unsigned int id);
     void change(unsigned int id, std::string const & s);
-    void freeze();
-    void thaw();
+    void freeze(request_type rt);
+    void thaw(request_type rt);
 
     ~gtk_clipboard_model();
 
@@ -26,7 +26,11 @@ struct gtk_clipboard_model : clipboard_model
 
     private:
 
-    void handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source, Glib::RefPtr<Gtk::Clipboard> other);
+    void handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source, void (gtk_clipboard_model::*update_other_silently)(std::string const &));
+    void setup_primary_default_owner_change_handler();
+    void setup_clipboard_default_owner_change_handler();
+    void update_primary_silently(std::string const & s);
+    void update_clipboard_silently(std::string const & s);
 
     void update_active_id(unsigned int id);
 
@@ -55,6 +59,8 @@ struct gtk_clipboard_model : clipboard_model
     std::mutex _owner_change_mutex;
 
     bool _frozen;
+
+    request_type _frozen_request_type;
 };
 
 

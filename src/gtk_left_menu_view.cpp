@@ -133,6 +133,14 @@ void gtk_left_menu_view::on_change(unsigned int id, std::string const & s)
     }
 }
 
+void gtk_left_menu_view::on_freeze(request_type rt)
+{
+}
+
+void gtk_left_menu_view::on_thaw()
+{
+}
+
 void gtk_left_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
 {
     auto l = dynamic_cast<Gtk::Label *>(mi.get_child());
@@ -143,7 +151,6 @@ void gtk_left_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
         l->set_max_width_chars(40);
     }
 }
-
 
 std::string gtk_left_menu_view::prepare_label_text(std::string s)
 {

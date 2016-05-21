@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "request_type.hpp"
+
 struct clipboard_view
 {
     // the entry with the given id has been moved to the first position
@@ -28,6 +30,9 @@ struct clipboard_view
 
     // an entry has been modified
     virtual void on_change(unsigned int id, std::string const & s) = 0;
+
+    virtual void on_freeze(request_type rt) = 0;
+    virtual void on_thaw() = 0;
 };
 
 #endif

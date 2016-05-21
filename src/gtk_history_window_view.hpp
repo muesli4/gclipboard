@@ -27,8 +27,12 @@ struct gtk_history_window_view : public Gtk::Window, clipboard_view
     void on_remove(unsigned int id);
     void on_remove_oldest();
     void on_change(unsigned int id, std::string const & s);
+    void on_freeze(request_type rt);
+    void on_thaw();
 
     private:
+
+    std::string get_window_title();
 
     Gtk::ListStore::iterator find_id(unsigned int id);
 

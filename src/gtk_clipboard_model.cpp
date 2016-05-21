@@ -11,53 +11,72 @@ gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     , _last_time() // TODO sensible initial value
     , _frozen(false)
 {
+    setup_primary_default_owner_change_handler();
+    setup_clipboard_default_owner_change_handler();
+}
+
+void gtk_clipboard_model::setup_primary_default_owner_change_handler()
+{
     _primary_con = _primary_ref->signal_owner_change().connect(
         [&](GdkEventOwnerChange * e)
         {
-            handle_owner_change(e, _primary_ref, _clipboard_ref);
-        }
-    );
-
-    _clipboard_con = _clipboard_ref->signal_owner_change().connect(
-        [&](GdkEventOwnerChange * e)
-        {
-            handle_owner_change(e, _clipboard_ref, _primary_ref);
+            handle_owner_change(e, _primary_ref, &gtk_clipboard_model::update_clipboard_silently);
         }
     );
 }
 
-void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source_ref, Glib::RefPtr<Gtk::Clipboard> other_ref)
+void gtk_clipboard_model::setup_clipboard_default_owner_change_handler()
 {
-    // This handler almost completely relies on timing, because it is nearly
-    // impossible to track when Gtk runs a handler and disconnecting and
-    // reconnecting is impossible. Also applications like firefox will send 3
-    // events at once.
+    _clipboard_con = _clipboard_ref->signal_owner_change().connect(
+        [&](GdkEventOwnerChange * e)
+        {
+            handle_owner_change(e, _clipboard_ref, &gtk_clipboard_model::update_primary_silently);
+        }
+    );
+}
+
+void gtk_clipboard_model::update_primary_silently(std::string const & s)
+{
+    _primary_con.disconnect();
+    _primary_con = _primary_ref->signal_owner_change().connect(
+        [&](GdkEventOwnerChange * e)
+        {
+            // TODO check if value is uneqal to the one set
+            _primary_con.disconnect();
+            setup_primary_default_owner_change_handler();
+        }
+    );
+    _primary_ref->set_text(s);
+}
+
+void gtk_clipboard_model::update_clipboard_silently(std::string const & s)
+{
+    _clipboard_con.disconnect();
+    _clipboard_con = _clipboard_ref->signal_owner_change().connect(
+        [&](GdkEventOwnerChange * e)
+        {
+            // TODO check if value is uneqal to the one set
+            _clipboard_con.disconnect();
+            setup_clipboard_default_owner_change_handler();
+        }
+    );
+    _clipboard_ref->set_text(s);
+}
+
+void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source_ref, void (gtk_clipboard_model::*update_other_silently)(std::string const &))
+{
+
+    // Some applications send more than one event with the same content.
     if (e->time - _last_time > 40)
     {
         // do we want the history to not change ?
         if (_frozen)
         {
-            // make sure to update the active indicator, but don't touch any entries
+            // make sure to update the active indicator, but don't sync with clipboard
             if (_active_valid)
             {
-                // hacky way, but the interface is terrible, so this is the best to come up with
-                auto text = source_ref->wait_for_text();
-                auto it = std::find_if(_text_buffer.begin(), _text_buffer.end(), [&](std::pair<std::string, unsigned int> p){ return p.first == text; });
-                if (it != _text_buffer.end())
-                {
-                    auto id = it->second;
-                    if (id != _active_id)
-                    {
-                        emit_unselect_active(_active_id);
-                        emit_select_active(id);
-                        _active_id = id;
-                    }
-                }
-                else
-                {
-                    emit_unselect_active(_active_id);
-                    _active_valid = false;
-                }
+                emit_unselect_active(_active_id);
+                _active_valid = false;
             }
         }
         else
@@ -68,6 +87,8 @@ void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, Glib::Ref
 
             if (locked)
             {
+                _last_time = e->time;
+
                 // note: this call will yield and may execute other code while
                 // it is suspended
                 auto text = source_ref->wait_for_text();
@@ -77,7 +98,7 @@ void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, Glib::Ref
                 if (_text_buffer.empty() || text != _text_buffer.front().first)
                 {
                     // sync with other clipboard
-                    other_ref->set_text(text);
+                    (this->*update_other_silently)(text);
 
                     // add to internal buffer
                     if (_text_buffer.full())
@@ -95,8 +116,6 @@ void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, Glib::Ref
                 }
             }
         }
-
-        _last_time = e->time;
     }
 }
 
@@ -117,8 +136,8 @@ void gtk_clipboard_model::update_active_id(unsigned int id)
 
 void gtk_clipboard_model::clear()
 {
-    _primary_ref->set_text("");
-    _clipboard_ref->set_text("");
+    update_primary_silently("");
+    update_clipboard_silently("");
     _text_buffer.clear();
     _active_valid = false;
     emit_clear();
@@ -129,8 +148,9 @@ void gtk_clipboard_model::select_active(unsigned int id)
     auto it = find_id(id);
     if (it != _text_buffer.end())
     {
-        _primary_ref->set_text(it->first);
-        _clipboard_ref->set_text(it->first);
+        auto text = it->first;
+        update_primary_silently(text);
+        update_clipboard_silently(text);
         update_active_id(id);
 
         // additionally this model will move active entries to the front
@@ -150,15 +170,23 @@ void gtk_clipboard_model::remove(unsigned int id)
     {
         _text_buffer.erase(it);
 
-        emit_remove(id);
-
         // did we delete the active entry?
         if (_active_valid && _active_id == id && !_text_buffer.empty())
         {
+            // then first unselect it
+            emit_unselect_active(_active_id);
+
             // make the first entry the active one
-            _active_id = _text_buffer.front().second;
+            auto const & p = _text_buffer.front();
+            auto text = p.first;
+            update_primary_silently(text);
+            update_clipboard_silently(text);
+
+            _active_id = p.second;
             emit_select_active(_active_id);
         }
+
+        emit_remove(id);
     }
 }
 
@@ -172,16 +200,34 @@ void gtk_clipboard_model::change(unsigned int id, std::string const & s)
     }
 }
 
-void gtk_clipboard_model::freeze()
+void gtk_clipboard_model::freeze(request_type rt)
 {
     // aquire the mutex to ensure that the last update will finish, if any
     std::lock_guard<std::mutex> lock(_owner_change_mutex);
+
+    // always prefer user choices
+    if (_frozen && rt == request_type::USER && _frozen_request_type == request_type::SYSTEM)
+    {
+        _frozen_request_type = request_type::USER;
+    }
+    else
+    {
+        _frozen_request_type = rt;
+    }
+
     _frozen = true;
+
+    emit_freeze(_frozen_request_type);
 }
 
-void gtk_clipboard_model::thaw()
+void gtk_clipboard_model::thaw(request_type rt)
 {
-    _frozen = false;
+    if ((rt == request_type::USER && _frozen_request_type == request_type::SYSTEM) || rt == _frozen_request_type)
+    {
+        // thaw if same request type as freeze or if user wants to
+        _frozen = false;
+        emit_thaw();
+    }
 }
 
 gtk_clipboard_model::iterator gtk_clipboard_model::find_id(unsigned int id)
@@ -200,5 +246,8 @@ void gtk_clipboard_model::init_view(clipboard_view & v)
 
     if (_active_valid)
         v.on_select_active(_active_id);
+
+    if (_frozen)
+        v.on_freeze(_frozen_request_type);
 }
 

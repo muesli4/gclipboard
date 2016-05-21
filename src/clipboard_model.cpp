@@ -78,6 +78,18 @@ void clipboard_model::emit_change(unsigned int id, std::string const & s)
         ptr->on_change(id, s);
 }
 
+void clipboard_model::emit_freeze(request_type rt)
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_freeze(rt);
+}
+
+void clipboard_model::emit_thaw()
+{
+    for (auto ptr : _view_pointers)
+        ptr->on_thaw();
+}
+
 unsigned int clipboard_model::fresh_id()
 {
     auto id = _id_src;

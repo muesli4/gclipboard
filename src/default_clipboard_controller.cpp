@@ -25,13 +25,13 @@ void default_clipboard_controller::clipboard_change(unsigned int id, std::string
     _m.change(id, s);
 }
 
-void default_clipboard_controller::clipboard_freeze()
+void default_clipboard_controller::clipboard_freeze(request_type rt)
 {
-    _m.freeze();
+    _m.freeze(rt);
 }
 
-void default_clipboard_controller::clipboard_thaw()
+void default_clipboard_controller::clipboard_thaw(request_type rt)
 {
-    _m.thaw();
+    _m.thaw(rt);
 }
 

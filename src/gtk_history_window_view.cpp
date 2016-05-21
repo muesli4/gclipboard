@@ -14,7 +14,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     , _ctrl(ctrl)
 
 {
-    this->set_title(gettext("History"));
+    this->set_title(get_window_title());
     this->set_icon_name("edit-paste");
     this->set_default_size(700, 500);
     this->set_position(Gtk::WIN_POS_CENTER_ALWAYS);
@@ -92,7 +92,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
             std::vector<std::pair<std::string, unsigned int>> entries;
 
             // prevent clipboard from changing while we edit it
-            _ctrl.clipboard_freeze();
+            _ctrl.clipboard_freeze(request_type::SYSTEM);
 
             _list_view_text.get_selection()->selected_foreach_iter(
                 [&](Gtk::TreeModel::iterator const & it)
@@ -115,13 +115,12 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
                     auto changes = dialog.get_changes();
                     for (auto p : changes)
                     {
-                        // TODO what if clipboard changes? freeze it manually?
                         ctrl.clipboard_change(p.second, p.first);
                     }
                 }
             }
 
-            _ctrl.clipboard_thaw();
+            _ctrl.clipboard_thaw(request_type::SYSTEM);
         }
     );
     _close_button.signal_released().connect([&](){ this->hide(); });
@@ -214,11 +213,26 @@ void gtk_history_window_view::on_change(unsigned int id, std::string const & s)
     }
 }
 
+void gtk_history_window_view::on_freeze(request_type rt)
+{
+    this->set_title(get_window_title() + " (" + (rt == request_type::USER ? std::string(gettext("manually")) + ' ' : "") + gettext("frozen") + ")");
+}
+
+void gtk_history_window_view::on_thaw()
+{
+    this->set_title(get_window_title());
+}
+
 gtk_history_window_view::history_model_column_record::history_model_column_record()
 {
     add(entry_column);
     add(plain_entry_column);
     add(id_column);
+}
+
+std::string gtk_history_window_view::get_window_title()
+{
+    return gettext("History");
 }
 
 Gtk::ListStore::iterator gtk_history_window_view::find_id(unsigned int id)

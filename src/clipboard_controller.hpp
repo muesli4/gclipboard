@@ -4,6 +4,7 @@
 #include <string>
 
 #include "clipboard_model.hpp"
+#include "request_type.hpp"
 
 struct clipboard_controller
 {
@@ -11,8 +12,8 @@ struct clipboard_controller
     virtual void clipboard_select_active(unsigned int id) = 0;
     virtual void clipboard_clear() = 0;
     virtual void clipboard_change(unsigned int id, std::string const & s) = 0;
-    virtual void clipboard_freeze() = 0;
-    virtual void clipboard_thaw() = 0;
+    virtual void clipboard_freeze(request_type rt) = 0;
+    virtual void clipboard_thaw(request_type rt) = 0;
 };
 
 #endif

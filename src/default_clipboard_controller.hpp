@@ -5,6 +5,7 @@
 
 #include "clipboard_model.hpp"
 #include "clipboard_controller.hpp"
+#include "request_type.hpp"
 
 struct default_clipboard_controller : clipboard_controller
 {
@@ -14,8 +15,8 @@ struct default_clipboard_controller : clipboard_controller
     void clipboard_select_active(unsigned int id);
     void clipboard_remove(unsigned int id);
     void clipboard_change(unsigned int id, std::string const & s);
-    void clipboard_freeze();
-    void clipboard_thaw();
+    void clipboard_freeze(request_type rt);
+    void clipboard_thaw(request_type rt);
 
     private:
     clipboard_model & _m;
