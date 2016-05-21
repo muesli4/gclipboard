@@ -97,14 +97,8 @@ struct enabled_menu_item_view : public Gtk::CheckMenuItem, clipboard_view
     void set_active_silently(bool active)
     {
         _c.disconnect();
-        _c = this->signal_toggled().connect(
-            [&]()
-            {
-                _c.disconnect();
-                setup_default_signal_toggled_handler();
-            }
-        );
         this->set_active(active);
+        setup_default_signal_toggled_handler();
     }
 
     clipboard_controller & _ctrl;

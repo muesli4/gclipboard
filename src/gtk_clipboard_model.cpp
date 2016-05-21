@@ -206,23 +206,28 @@ void gtk_clipboard_model::freeze(request_type rt)
     std::lock_guard<std::mutex> lock(_owner_change_mutex);
 
     // always prefer user choices
-    if (_frozen && rt == request_type::USER && _frozen_request_type == request_type::SYSTEM)
+    if (_frozen && rt != _frozen_request_type)
     {
+
+        if (_frozen_request_type == request_type::SYSTEM)
+        {
+            emit_freeze(request_type::USER);
+        }
         _frozen_request_type = request_type::USER;
     }
     else
     {
+        _frozen = true;
         _frozen_request_type = rt;
+        emit_freeze(rt);
     }
 
-    _frozen = true;
 
-    emit_freeze(_frozen_request_type);
 }
 
 void gtk_clipboard_model::thaw(request_type rt)
 {
-    if ((rt == request_type::USER && _frozen_request_type == request_type::SYSTEM) || rt == _frozen_request_type)
+    if (rt == request_type::USER || rt == _frozen_request_type)
     {
         // thaw if same request type as freeze or if user wants to
         _frozen = false;
