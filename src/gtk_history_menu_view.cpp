@@ -4,11 +4,11 @@
 #include <glibmm.h>
 #include <pangomm.h>
 
-#include "gtk_left_menu_view.hpp"
+#include "gtk_history_menu_view.hpp"
 #include "util.hpp"
 #include "gettext.h"
 
-gtk_left_menu_view::gtk_left_menu_view(clipboard_controller & ctrl)
+gtk_history_menu_view::gtk_history_menu_view(clipboard_controller & ctrl)
     : _empty_indicator_menu_item(gettext("Empty"))
     , _ctrl(ctrl)
 {
@@ -17,7 +17,7 @@ gtk_left_menu_view::gtk_left_menu_view(clipboard_controller & ctrl)
     this->append(_empty_indicator_menu_item);
 }
 
-void gtk_left_menu_view::on_move_front(unsigned int id)
+void gtk_history_menu_view::on_move_front(unsigned int id)
 {
     auto it = find_id(id);
     if (it != _menu_items.end())
@@ -34,7 +34,7 @@ void gtk_left_menu_view::on_move_front(unsigned int id)
     }
 }
 
-void gtk_left_menu_view::on_select_active(unsigned int id)
+void gtk_history_menu_view::on_select_active(unsigned int id)
 {
     auto it = find_id(id);
 
@@ -44,7 +44,7 @@ void gtk_left_menu_view::on_select_active(unsigned int id)
     }
 }
 
-void gtk_left_menu_view::on_unselect_active(unsigned int id)
+void gtk_history_menu_view::on_unselect_active(unsigned int id)
 {
     auto it = find_id(id);
 
@@ -54,7 +54,7 @@ void gtk_left_menu_view::on_unselect_active(unsigned int id)
     }
 }
 
-void gtk_left_menu_view::on_clear()
+void gtk_history_menu_view::on_clear()
 {
     for (auto & p : _menu_items)
     {
@@ -66,7 +66,7 @@ void gtk_left_menu_view::on_clear()
         show_empty_indicator();
 }
 
-void gtk_left_menu_view::on_add(std::string const & s, unsigned int id)
+void gtk_history_menu_view::on_add(std::string const & s, unsigned int id)
 {
     hide_empty_indicator();
 
@@ -93,7 +93,7 @@ void gtk_left_menu_view::on_add(std::string const & s, unsigned int id)
     this->prepend(mi);
 }
 
-void gtk_left_menu_view::on_remove(unsigned int id)
+void gtk_history_menu_view::on_remove(unsigned int id)
 {
     auto it = find_id(id);
     if (it != _menu_items.end())
@@ -107,7 +107,7 @@ void gtk_left_menu_view::on_remove(unsigned int id)
     }
 }
 
-void gtk_left_menu_view::on_remove_oldest()
+void gtk_history_menu_view::on_remove_oldest()
 {
     this->remove(_menu_items.back().first);
     _menu_items.pop_back();
@@ -118,7 +118,7 @@ void gtk_left_menu_view::on_remove_oldest()
     }
 }
 
-void gtk_left_menu_view::on_change(unsigned int id, std::string const & s)
+void gtk_history_menu_view::on_change(unsigned int id, std::string const & s)
 {
     auto it = find_id(id);
     if (it != _menu_items.end())
@@ -133,15 +133,15 @@ void gtk_left_menu_view::on_change(unsigned int id, std::string const & s)
     }
 }
 
-void gtk_left_menu_view::on_freeze(request_type rt)
+void gtk_history_menu_view::on_freeze(request_type rt)
 {
 }
 
-void gtk_left_menu_view::on_thaw()
+void gtk_history_menu_view::on_thaw()
 {
 }
 
-void gtk_left_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
+void gtk_history_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
 {
     auto l = dynamic_cast<Gtk::Label *>(mi.get_child());
     if (l != 0)
@@ -152,39 +152,39 @@ void gtk_left_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
     }
 }
 
-std::string gtk_left_menu_view::prepare_label_text(std::string s)
+std::string gtk_history_menu_view::prepare_label_text(std::string s)
 {
     return Glib::Markup::escape_text(replace_special_whitespace_characters(s));
 }
 
-bool gtk_left_menu_view::has_bold_weight(Gtk::MenuItem & mi)
+bool gtk_history_menu_view::has_bold_weight(Gtk::MenuItem & mi)
 {
     return mi.get_label()[0] == '<';
 }
 
-void gtk_left_menu_view::set_bold_weight(Gtk::MenuItem & mi)
+void gtk_history_menu_view::set_bold_weight(Gtk::MenuItem & mi)
 {
     mi.set_label("<b>" + mi.get_label() + "</b>");
 }
 
-void gtk_left_menu_view::set_normal_weight(Gtk::MenuItem & mi)
+void gtk_history_menu_view::set_normal_weight(Gtk::MenuItem & mi)
 {
     auto const & text = mi.get_label();
     //// FIXME is there some less hacky way to set and remove bold layout on a MenuItem?
     mi.set_label(text.substr(3, text.size() - 7));
 }
 
-void gtk_left_menu_view::hide_empty_indicator()
+void gtk_history_menu_view::hide_empty_indicator()
 {
     this->remove(_empty_indicator_menu_item);
 }
 
-void gtk_left_menu_view::show_empty_indicator()
+void gtk_history_menu_view::show_empty_indicator()
 {
     this->append(_empty_indicator_menu_item);
 }
 
-gtk_left_menu_view::buffer_iterator gtk_left_menu_view::find_id(unsigned int id)
+gtk_history_menu_view::buffer_iterator gtk_history_menu_view::find_id(unsigned int id)
 {
     return std::find_if(_menu_items.begin(), _menu_items.end(), [id](std::pair<Gtk::MenuItem, unsigned int> const & p){ return p.second == id; });
 }

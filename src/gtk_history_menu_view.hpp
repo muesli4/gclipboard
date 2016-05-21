@@ -1,5 +1,5 @@
-#ifndef CLIPBOARD_GTK_LEFT_MENU_VIEW_HPP
-#define CLIPBOARD_GTK_LEFT_MENU_VIEW_HPP
+#ifndef CLIPBOARD_GTK_HISTORY_MENU_VIEW_HPP
+#define CLIPBOARD_GTK_HISTORY_MENU_VIEW_HPP
 
 #include <deque>
 
@@ -10,9 +10,9 @@
 #include "clipboard_controller.hpp"
 
 // TODO maybe remove public inheritance of Menu
-struct gtk_left_menu_view : public Gtk::Menu, clipboard_view
+struct gtk_history_menu_view : public Gtk::Menu, clipboard_view
 {
-    gtk_left_menu_view(clipboard_controller & ctrl);
+    gtk_history_menu_view(clipboard_controller & ctrl);
 
     // methods inherited to implement a view
     void on_move_front(unsigned int id);

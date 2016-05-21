@@ -9,7 +9,7 @@
 
 #include "default_clipboard_controller.hpp"
 #include "gtk_clipboard_model.hpp"
-#include "gtk_left_menu_view.hpp"
+#include "gtk_history_menu_view.hpp"
 #include "gtk_history_window_view.hpp"
 
 #include "gettext.h"
@@ -127,13 +127,13 @@ int main(int argc, char ** argv)
     default_clipboard_controller ctrl(m);
 
     // left click menu
-    gtk_left_menu_view left_menu(ctrl);
+    gtk_history_menu_view history_menu(ctrl);
 
     // history window
     gtk_history_window_view history_window(ctrl);
 
     // connect to model
-    m.add_view(left_menu);
+    m.add_view(history_menu);
     m.add_view(history_window);
 
     Gtk::AboutDialog about_dialog;
@@ -179,7 +179,7 @@ int main(int argc, char ** argv)
         {
             if (e->button == 1)
             {
-                status_icon_ref->popup_menu_at_position(left_menu, 1, e->time);
+                status_icon_ref->popup_menu_at_position(history_menu, 1, e->time);
             }
             else if (e->button == 3)
             {
