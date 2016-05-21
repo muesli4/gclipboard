@@ -149,8 +149,6 @@ int main(int argc, char ** argv)
         about_dialog.set_comments(gettext("A clean and simple clipboard manager, which has been influenced by other popular clipboard managers."));
         about_dialog.set_copyright("Copyright © 2016 Moritz Bruder");
         about_dialog.set_icon_name(icon_name);
-        //about_dialog.set_transient_for(history_window);
-        // TODO finish
 
         // right click menu
         Gtk::Menu right_menu;
@@ -166,8 +164,24 @@ int main(int argc, char ** argv)
         clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
         edit_history_item.signal_activate().connect([&](){ history_window.show(); });
         m.add_view(enabled_item);
-        about_item.signal_activate().connect([&](){ about_dialog.run(); about_dialog.hide(); });
-        quit_item.signal_activate().connect([app_ref](){ app_ref->release(); });
+        about_item.signal_activate().connect(
+            [&]()
+            {
+                app_ref->add_window(about_dialog);
+                about_dialog.run();
+                about_dialog.hide();
+                app_ref->remove_window(about_dialog);
+            }
+        );
+        sigc::connection quit_con = quit_item.signal_activate().connect(
+            [&]()
+            {
+                app_ref->release();
+                quit_con.disconnect();
+                about_dialog.response(Gtk::RESPONSE_DELETE_EVENT);
+                quit_item.set_sensitive(false);
+            }
+        );
 
         right_menu.append(clear_item);
         right_menu.append(edit_history_item);
