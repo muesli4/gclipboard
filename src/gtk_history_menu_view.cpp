@@ -70,9 +70,10 @@ void gtk_history_menu_view::on_add(std::string const & s, unsigned int id)
 {
     hide_empty_indicator();
 
-    // TODO trim string to length and replace newlines
+    // TODO replace newlines
+    // TODO shortened before, because gtk label is slow with long text
     _menu_items.emplace_front(
-        std::make_pair( prepare_label_text(s)
+        std::make_pair( prepare_label_text(s.substr(0, 50))
                       , id
                       )
     );

@@ -10,8 +10,8 @@
 #include <gtkmm/treemodelfilter.h>
 #include <gtkmm/window.h>
 
-#include "clipboard_controller.hpp"
-#include "clipboard_view.hpp"
+#include "clipboard/clipboard_controller.hpp"
+#include "clipboard/clipboard_view.hpp"
 
 struct gtk_history_window_view : public Gtk::Window, clipboard_view
 {

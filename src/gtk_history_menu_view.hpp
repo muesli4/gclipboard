@@ -6,8 +6,8 @@
 #include "gtkmm/menu.h"
 #include "gtkmm/menuitem.h"
 
-#include "clipboard_view.hpp"
-#include "clipboard_controller.hpp"
+#include "clipboard/clipboard_view.hpp"
+#include "clipboard/clipboard_controller.hpp"
 
 // TODO maybe remove public inheritance of Menu
 struct gtk_history_menu_view : public Gtk::Menu, clipboard_view

@@ -1,9 +1,8 @@
 AC_INIT([gclipboard], [0.1.0], [muesli4@gmail.com])
-
 AC_CONFIG_MACRO_DIR([m4])
 
 # TODO what options to we need to pass?
-AM_INIT_AUTOMAKE([1.9 foreign])
+AM_INIT_AUTOMAKE([1.9 foreign subdir-objects])
 
 # make sure a suitable c++ compiler is found
 AC_PROG_CXX

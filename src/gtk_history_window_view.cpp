@@ -4,6 +4,9 @@
 #include "util.hpp"
 #include "gettext.h"
 
+// TODO implement key shortcuts for select (enter) and delete (del)
+// TODO implement a way to indicate selection: extra column or bold layout
+
 gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
     : Gtk::Window()
     , _remove_button(Gtk::Stock::REMOVE)

@@ -5,7 +5,7 @@
 #include <gtkmm/clipboard.h>
 #include <mutex>
 
-#include "clipboard_model.hpp"
+#include "clipboard/clipboard_model.hpp"
 
 struct gtk_clipboard_model : clipboard_model
 {

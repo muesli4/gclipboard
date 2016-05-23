@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "clipboard_model.hpp"
-#include "clipboard_controller.hpp"
-#include "request_type.hpp"
+#include "clipboard/clipboard_model.hpp"
+#include "clipboard/clipboard_controller.hpp"
+#include "clipboard/request_type.hpp"
 
 struct default_clipboard_controller : clipboard_controller
 {
