@@ -200,7 +200,7 @@ void gtk_clipboard_model::change(unsigned int id, std::string const & s)
     }
 }
 
-void gtk_clipboard_model::freeze(request_type rt)
+void gtk_clipboard_model::freeze(clipboard::request_type rt)
 {
     // aquire the mutex to ensure that the last update will finish, if any
     std::lock_guard<std::mutex> lock(_owner_change_mutex);
@@ -209,11 +209,11 @@ void gtk_clipboard_model::freeze(request_type rt)
     if (_frozen && rt != _frozen_request_type)
     {
 
-        if (_frozen_request_type == request_type::SYSTEM)
+        if (_frozen_request_type == clipboard::request_type::SYSTEM)
         {
-            emit_freeze(request_type::USER);
+            emit_freeze(clipboard::request_type::USER);
         }
-        _frozen_request_type = request_type::USER;
+        _frozen_request_type = clipboard::request_type::USER;
     }
     else
     {
@@ -225,9 +225,9 @@ void gtk_clipboard_model::freeze(request_type rt)
 
 }
 
-void gtk_clipboard_model::thaw(request_type rt)
+void gtk_clipboard_model::thaw(clipboard::request_type rt)
 {
-    if (rt == request_type::USER || rt == _frozen_request_type)
+    if (rt == clipboard::request_type::USER || rt == _frozen_request_type)
     {
         // thaw if same request type as freeze or if user wants to
         _frozen = false;
@@ -244,7 +244,7 @@ gtk_clipboard_model::~gtk_clipboard_model()
 {
 }
 
-void gtk_clipboard_model::init_view(clipboard_view & v)
+void gtk_clipboard_model::init_view(clipboard::view & v)
 {
     for (auto p : _text_buffer)
         v.on_add(p.first, p.second);

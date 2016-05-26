@@ -3,23 +3,23 @@
 
 #include <string>
 
-#include "clipboard/clipboard_model.hpp"
-#include "clipboard/clipboard_controller.hpp"
+#include "clipboard/model.hpp"
+#include "clipboard/controller.hpp"
 #include "clipboard/request_type.hpp"
 
-struct default_clipboard_controller : clipboard_controller
+struct default_clipboard_controller : clipboard::controller
 {
-    default_clipboard_controller(clipboard_model & m);
+    default_clipboard_controller(clipboard::model & m);
 
     void clipboard_clear();
     void clipboard_select_active(unsigned int id);
     void clipboard_remove(unsigned int id);
     void clipboard_change(unsigned int id, std::string const & s);
-    void clipboard_freeze(request_type rt);
-    void clipboard_thaw(request_type rt);
+    void clipboard_freeze(clipboard::request_type rt);
+    void clipboard_thaw(clipboard::request_type rt);
 
     private:
-    clipboard_model & _m;
+    clipboard::model & _m;
 };
 
 #endif

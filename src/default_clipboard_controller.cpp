@@ -1,6 +1,6 @@
 #include "default_clipboard_controller.hpp"
 
-default_clipboard_controller::default_clipboard_controller(clipboard_model & m)
+default_clipboard_controller::default_clipboard_controller(clipboard::model & m)
     : _m(m)
 {
 }
@@ -25,12 +25,12 @@ void default_clipboard_controller::clipboard_change(unsigned int id, std::string
     _m.change(id, s);
 }
 
-void default_clipboard_controller::clipboard_freeze(request_type rt)
+void default_clipboard_controller::clipboard_freeze(clipboard::request_type rt)
 {
     _m.freeze(rt);
 }
 
-void default_clipboard_controller::clipboard_thaw(request_type rt)
+void default_clipboard_controller::clipboard_thaw(clipboard::request_type rt)
 {
     _m.thaw(rt);
 }

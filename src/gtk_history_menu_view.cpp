@@ -8,7 +8,7 @@
 #include "util.hpp"
 #include "gettext.h"
 
-gtk_history_menu_view::gtk_history_menu_view(clipboard_controller & ctrl)
+gtk_history_menu_view::gtk_history_menu_view(clipboard::controller & ctrl)
     : _empty_indicator_menu_item(gettext("Empty"))
     , _ctrl(ctrl)
 {
@@ -134,7 +134,7 @@ void gtk_history_menu_view::on_change(unsigned int id, std::string const & s)
     }
 }
 
-void gtk_history_menu_view::on_freeze(request_type rt)
+void gtk_history_menu_view::on_freeze(clipboard::request_type rt)
 {
 }
 

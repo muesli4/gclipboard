@@ -5,9 +5,9 @@
 #include <gtkmm/clipboard.h>
 #include <mutex>
 
-#include "clipboard/clipboard_model.hpp"
+#include "clipboard/model.hpp"
 
-struct gtk_clipboard_model : clipboard_model
+struct gtk_clipboard_model : clipboard::model
 {
     gtk_clipboard_model(unsigned int buffer_size);
 
@@ -15,14 +15,14 @@ struct gtk_clipboard_model : clipboard_model
     void select_active(unsigned int id);
     void remove(unsigned int id);
     void change(unsigned int id, std::string const & s);
-    void freeze(request_type rt);
-    void thaw(request_type rt);
+    void freeze(clipboard::request_type rt);
+    void thaw(clipboard::request_type rt);
 
     ~gtk_clipboard_model();
 
     protected:
 
-    void init_view(clipboard_view & v);
+    void init_view(clipboard::view & v);
 
     private:
 
@@ -60,7 +60,7 @@ struct gtk_clipboard_model : clipboard_model
 
     bool _frozen;
 
-    request_type _frozen_request_type;
+    clipboard::request_type _frozen_request_type;
 };
 
 

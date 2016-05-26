@@ -6,13 +6,13 @@
 #include "gtkmm/menu.h"
 #include "gtkmm/menuitem.h"
 
-#include "clipboard/clipboard_view.hpp"
-#include "clipboard/clipboard_controller.hpp"
+#include "clipboard/view.hpp"
+#include "clipboard/controller.hpp"
 
 // TODO maybe remove public inheritance of Menu
-struct gtk_history_menu_view : public Gtk::Menu, clipboard_view
+struct gtk_history_menu_view : public Gtk::Menu, clipboard::view
 {
-    gtk_history_menu_view(clipboard_controller & ctrl);
+    gtk_history_menu_view(clipboard::controller & ctrl);
 
     // methods inherited to implement a view
     void on_move_front(unsigned int id);
@@ -23,7 +23,7 @@ struct gtk_history_menu_view : public Gtk::Menu, clipboard_view
     void on_remove(unsigned int id);
     void on_remove_oldest();
     void on_change(unsigned int id, std::string const & s);
-    void on_freeze(request_type rt);
+    void on_freeze(clipboard::request_type rt);
     void on_thaw();
 
     private:
@@ -45,7 +45,7 @@ struct gtk_history_menu_view : public Gtk::Menu, clipboard_view
 
     Gtk::MenuItem _empty_indicator_menu_item;
 
-    clipboard_controller & _ctrl;
+    clipboard::controller & _ctrl;
 
     // new items are inserted into the back
     buffer_type _menu_items;

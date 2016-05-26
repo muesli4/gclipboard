@@ -7,7 +7,7 @@
 // TODO implement key shortcuts for select (enter) and delete (del)
 // TODO implement a way to indicate selection: extra column or bold layout
 
-gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
+gtk_history_window_view::gtk_history_window_view(clipboard::controller & ctrl)
     : Gtk::Window()
     , _remove_button(Gtk::Stock::REMOVE)
     , _clear_button(Gtk::Stock::CLEAR)
@@ -95,7 +95,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
             std::vector<std::pair<std::string, unsigned int>> entries;
 
             // prevent clipboard from changing while we edit it
-            _ctrl.clipboard_freeze(request_type::SYSTEM);
+            _ctrl.clipboard_freeze(clipboard::request_type::SYSTEM);
 
             _list_view_text.get_selection()->selected_foreach_iter(
                 [&](Gtk::TreeModel::iterator const & it)
@@ -123,7 +123,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard_controller & ctrl)
                 }
             }
 
-            _ctrl.clipboard_thaw(request_type::SYSTEM);
+            _ctrl.clipboard_thaw(clipboard::request_type::SYSTEM);
         }
     );
     _close_button.signal_released().connect([&](){ this->hide(); });
@@ -216,9 +216,9 @@ void gtk_history_window_view::on_change(unsigned int id, std::string const & s)
     }
 }
 
-void gtk_history_window_view::on_freeze(request_type rt)
+void gtk_history_window_view::on_freeze(clipboard::request_type rt)
 {
-    this->set_title(get_window_title() + " (" + (rt == request_type::USER ? std::string(gettext("manually")) + ' ' : "") + gettext("frozen") + ")");
+    this->set_title(get_window_title() + " (" + (rt == clipboard::request_type::USER ? std::string(gettext("manually")) + ' ' : "") + gettext("frozen") + ")");
 }
 
 void gtk_history_window_view::on_thaw()

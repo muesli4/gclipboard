@@ -2,7 +2,6 @@
 #include <gtkmm/application.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/imagemenuitem.h>
-#include <gtkmm/checkmenuitem.h>
 #include <gtkmm/separatormenuitem.h>
 #include <gtkmm/aboutdialog.h>
 #include <gtkmm/stock.h>
@@ -11,6 +10,7 @@
 #include "gtk_clipboard_model.hpp"
 #include "gtk_history_menu_view.hpp"
 #include "gtk_history_window_view.hpp"
+#include "gtk_enabled_menu_item_view.hpp"
 
 #include "gettext.h"
 
@@ -23,87 +23,6 @@
 
 char const * const icon_name = "edit-paste";
 
-struct enabled_menu_item_view : public Gtk::CheckMenuItem, clipboard_view
-{
-    enabled_menu_item_view(Glib::ustring const & label, clipboard_controller & ctrl)
-        : Gtk::CheckMenuItem(label)
-        , _ctrl(ctrl)
-    {
-        this->set_active();
-        setup_default_signal_toggled_handler();
-    }
-
-    void on_move_front(unsigned int id)
-    {
-    }
-
-    void on_select_active(unsigned int id)
-    {
-    }
-
-    void on_unselect_active(unsigned int id)
-    {
-    }
-
-    void on_clear()
-    {
-    }
-
-    void on_add(std::string const & s, unsigned int id)
-    {
-    }
-
-    void on_remove(unsigned int id)
-    {
-    }
-
-    void on_remove_oldest()
-    {
-    }
-
-    void on_change(unsigned int id, std::string const & s)
-    {
-    }
-
-    void on_freeze(request_type rt)
-    {
-        set_active_silently(false);
-    }
-
-    void on_thaw()
-    {
-        set_active_silently(true);
-    }
-
-    private:
-
-    void setup_default_signal_toggled_handler()
-    {
-        _c = this->signal_toggled().connect(
-            [&]()
-            {
-                if (this->get_active())
-                {
-                    _ctrl.clipboard_thaw(request_type::USER);
-                }
-                else
-                {
-                    _ctrl.clipboard_freeze(request_type::USER);
-                }
-            }
-        );
-    }
-
-    void set_active_silently(bool active)
-    {
-        _c.disconnect();
-        this->set_active(active);
-        setup_default_signal_toggled_handler();
-    }
-
-    clipboard_controller & _ctrl;
-    sigc::connection _c;
-};
 
 int main(int argc, char ** argv)
 {
@@ -149,7 +68,7 @@ int main(int argc, char ** argv)
         Gtk::Menu right_menu;
         Gtk::ImageMenuItem clear_item(Gtk::Stock::CLEAR);
         Gtk::ImageMenuItem edit_history_item(Gtk::Stock::EDIT);
-        enabled_menu_item_view enabled_item(gettext("Enable history"), ctrl);
+        gtk_enabled_menu_item_view enabled_item(gettext("Enable history"), ctrl);
         Gtk::SeparatorMenuItem sep_item;
         Gtk::ImageMenuItem settings_item(Gtk::Stock::PREFERENCES);
         Gtk::ImageMenuItem about_item(Gtk::Stock::ABOUT);

@@ -10,12 +10,12 @@
 #include <gtkmm/treemodelfilter.h>
 #include <gtkmm/window.h>
 
-#include "clipboard/clipboard_controller.hpp"
-#include "clipboard/clipboard_view.hpp"
+#include "clipboard/controller.hpp"
+#include "clipboard/view.hpp"
 
-struct gtk_history_window_view : public Gtk::Window, clipboard_view
+struct gtk_history_window_view : public Gtk::Window, clipboard::view
 {
-    gtk_history_window_view(clipboard_controller & ctrl);
+    gtk_history_window_view(clipboard::controller & ctrl);
 
     ~gtk_history_window_view();
 
@@ -27,7 +27,7 @@ struct gtk_history_window_view : public Gtk::Window, clipboard_view
     void on_remove(unsigned int id);
     void on_remove_oldest();
     void on_change(unsigned int id, std::string const & s);
-    void on_freeze(request_type rt);
+    void on_freeze(clipboard::request_type rt);
     void on_thaw();
 
     private:
@@ -66,7 +66,7 @@ struct gtk_history_window_view : public Gtk::Window, clipboard_view
     // the gtk view
     Gtk::ListViewText _list_view_text;
 
-    clipboard_controller & _ctrl;
+    clipboard::controller & _ctrl;
 };
 
 #endif
