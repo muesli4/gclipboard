@@ -1,7 +1,8 @@
 #ifndef GCLIPBOARD_REQUEST_TYPE_HPP
 #define GCLIPBOARD_REQUEST_TYPE_HPP
 
-namespace clipboard {
+namespace clipboard
+{
     enum class request_type
     {
         USER,

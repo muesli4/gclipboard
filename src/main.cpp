@@ -14,6 +14,10 @@
 
 #include "gettext.h"
 
+#include "preferences/model.hpp"
+
+preferences::model m;
+
 // TODO settings
 // TODO save session
 // TODO add unicode symbols in lines to show special whitespace characters:

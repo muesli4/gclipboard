@@ -5,7 +5,8 @@
 
 #include "request_type.hpp"
 
-namespace clipboard {
+namespace clipboard
+{
     struct view
     {
         // the entry with the given id has been moved to the first position

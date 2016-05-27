@@ -6,7 +6,8 @@
 #include "model.hpp"
 #include "request_type.hpp"
 
-namespace clipboard {
+namespace clipboard
+{
     struct controller
     {
         virtual void clipboard_remove(unsigned int id) = 0;

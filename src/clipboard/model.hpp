@@ -7,14 +7,13 @@
 
 #include "view.hpp"
 
-namespace clipboard {
-    struct model
+#include "../util/model_template.hpp"
+
+namespace clipboard
+{
+    struct model : util::model_template<view>
     {
         model();
-
-        // view handling
-        void add_view(view & v);
-        void remove_view(view & v);
 
         // clear all entries
         virtual void clear() = 0;
@@ -49,11 +48,7 @@ namespace clipboard {
 
         private:
 
-        std::vector<view *>::iterator find_ptr(view * p);
-
         unsigned int _id_src;
-
-        std::vector<view *> _view_pointers;
     };
 }
 
