@@ -3,22 +3,14 @@
 
 #include <gtkmm/checkmenuitem.h>
 
-#include <clipboard/controller.hpp>
-#include <clipboard/view.hpp>
+#include <freezable/controller.hpp>
+#include <freezable/view.hpp>
 
-struct gtk_enabled_menu_item_view : public Gtk::CheckMenuItem, clipboard::view
+struct gtk_enabled_menu_item_view : public Gtk::CheckMenuItem, freezable::view
 {
-    gtk_enabled_menu_item_view(Glib::ustring const & label, clipboard::controller & ctrl);
+    gtk_enabled_menu_item_view(Glib::ustring const & label, freezable::controller & ctrl);
 
-    void on_move_front(unsigned int id);
-    void on_select_active(unsigned int id);
-    void on_unselect_active(unsigned int id);
-    void on_clear();
-    void on_add(std::string const & s, unsigned int id);
-    void on_remove(unsigned int id);
-    void on_remove_oldest();
-    void on_change(unsigned int id, std::string const & s);
-    void on_freeze(clipboard::request_type rt);
+    void on_freeze(freezable::request_type rt);
     void on_thaw();
 
     private:
@@ -26,7 +18,7 @@ struct gtk_enabled_menu_item_view : public Gtk::CheckMenuItem, clipboard::view
     void setup_default_signal_toggled_handler();
     void set_active_silently(bool active);
 
-    clipboard::controller & _ctrl;
+    freezable::controller & _ctrl;
     sigc::connection _c;
 };
 

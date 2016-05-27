@@ -31,6 +31,7 @@ namespace util
         void add_view(View & v)
         {
             _view_ptrs.push_back(&v);
+            init_view(v);
         }
 
         void remove_view(View & v)
@@ -53,10 +54,25 @@ namespace util
             }
         }
 
+        virtual void init_view(View & v) = 0;
+
         private:
 
         std::vector<View *> _view_ptrs;
     };
+
+    // workarround for stupid c++ function lookup definition
+    template <typename View>
+    void add_view(model_template<View> & m, View & v)
+    {
+        m.add_view(v);
+    }
+
+    template <typename View>
+    void remove_view(model_template<View> & m, View & v)
+    {
+        m.remove_view(v);
+    }
 }
 
 #endif

@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include "request_type.hpp"
-
 namespace clipboard
 {
     struct view
@@ -32,9 +30,6 @@ namespace clipboard
 
         // an entry has been modified
         virtual void on_change(unsigned int id, std::string const & s) = 0;
-
-        virtual void on_freeze(request_type rt) = 0;
-        virtual void on_thaw() = 0;
     };
 }
 

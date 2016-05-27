@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "model.hpp"
 
 namespace clipboard
@@ -21,8 +19,6 @@ namespace clipboard
     DEFINE_MODEL_EMIT1(remove, unsigned int, id)
     DEFINE_MODEL_EMIT0(remove_oldest)
     DEFINE_MODEL_EMIT2(change, unsigned int, id, std::string const &, s)
-    DEFINE_MODEL_EMIT1(freeze, request_type, rt)
-    DEFINE_MODEL_EMIT0(thaw)
 
     unsigned int model::fresh_id()
     {

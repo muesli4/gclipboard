@@ -7,14 +7,15 @@
 // TODO implement key shortcuts for select (enter) and delete (del)
 // TODO implement a way to indicate selection: extra column or bold layout
 
-gtk_history_window_view::gtk_history_window_view(clipboard::controller & ctrl)
+gtk_history_window_view::gtk_history_window_view(clipboard::controller & cc, freezable::controller & fc)
     : Gtk::Window()
     , _remove_button(Gtk::Stock::REMOVE)
     , _clear_button(Gtk::Stock::CLEAR)
     , _edit_button(Gtk::Stock::EDIT)
     , _close_button(Gtk::Stock::CLOSE)
     , _list_view_text(0)
-    , _ctrl(ctrl)
+    , _cc(cc)
+    , _fc(fc)
 
 {
     this->set_title(get_window_title());
@@ -69,7 +70,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & ctrl)
     _vbox.pack_start(_scrolled_window, true, true, 2);
 
     // controls
-    _clear_button.signal_released().connect([&](){ _ctrl.clipboard_clear(); });
+    _clear_button.signal_released().connect([&](){ _cc.clipboard_clear(); });
     _remove_button.set_sensitive(false);
     _remove_button.signal_released().connect(
         [&]()
@@ -85,7 +86,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & ctrl)
             );
 
             for (auto id : ids)
-                _ctrl.clipboard_remove(id);
+                _cc.clipboard_remove(id);
         }
     );
     _edit_button.set_sensitive(false);
@@ -95,7 +96,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & ctrl)
             std::vector<std::pair<std::string, unsigned int>> entries;
 
             // prevent clipboard from changing while we edit it
-            _ctrl.clipboard_freeze(clipboard::request_type::SYSTEM);
+            _fc.freezable_freeze(freezable::request_type::SYSTEM);
 
             _list_view_text.get_selection()->selected_foreach_iter(
                 [&](Gtk::TreeModel::iterator const & it)
@@ -118,12 +119,12 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & ctrl)
                     auto changes = dialog.get_changes();
                     for (auto p : changes)
                     {
-                        ctrl.clipboard_change(p.second, p.first);
+                        _cc.clipboard_change(p.second, p.first);
                     }
                 }
             }
 
-            _ctrl.clipboard_thaw(clipboard::request_type::SYSTEM);
+            _fc.freezable_thaw(freezable::request_type::SYSTEM);
         }
     );
     _close_button.signal_released().connect([&](){ this->hide(); });
@@ -216,9 +217,9 @@ void gtk_history_window_view::on_change(unsigned int id, std::string const & s)
     }
 }
 
-void gtk_history_window_view::on_freeze(clipboard::request_type rt)
+void gtk_history_window_view::on_freeze(freezable::request_type rt)
 {
-    this->set_title(get_window_title() + " (" + (rt == clipboard::request_type::USER ? std::string(gettext("manually")) + ' ' : "") + gettext("frozen") + ")");
+    this->set_title(get_window_title() + " (" + (rt == freezable::request_type::USER ? std::string(gettext("manually")) + ' ' : "") + gettext("frozen") + ")");
 }
 
 void gtk_history_window_view::on_thaw()

@@ -6,8 +6,10 @@
 #include <mutex>
 
 #include "clipboard/model.hpp"
+#include "freezable/model.hpp"
+#include "freezable/request_type.hpp"
 
-struct gtk_clipboard_model : clipboard::model
+struct gtk_clipboard_model : clipboard::model, freezable::model
 {
     gtk_clipboard_model(unsigned int buffer_size);
 
@@ -15,14 +17,15 @@ struct gtk_clipboard_model : clipboard::model
     void select_active(unsigned int id);
     void remove(unsigned int id);
     void change(unsigned int id, std::string const & s);
-    void freeze(clipboard::request_type rt);
-    void thaw(clipboard::request_type rt);
+    void freeze(freezable::request_type rt);
+    void thaw(freezable::request_type rt);
 
     ~gtk_clipboard_model();
 
     protected:
 
     void init_view(clipboard::view & v);
+    void init_view(freezable::view & v);
 
     private:
 
@@ -60,7 +63,7 @@ struct gtk_clipboard_model : clipboard::model
 
     bool _frozen;
 
-    clipboard::request_type _frozen_request_type;
+    freezable::request_type _frozen_request_type;
 };
 
 

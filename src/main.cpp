@@ -14,10 +14,6 @@
 
 #include "gettext.h"
 
-#include "preferences/model.hpp"
-
-preferences::model m;
-
 // TODO settings
 // TODO save session
 // TODO add unicode symbols in lines to show special whitespace characters:
@@ -48,17 +44,18 @@ int main(int argc, char ** argv)
         // Gtkmm to manage both clipboards
         gtk_clipboard_model m(10);
 
-        default_clipboard_controller ctrl(m);
+        default_clipboard_controller ctrl(m, m);
 
         // left click menu
         gtk_history_menu_view history_menu(ctrl);
 
         // history window
-        gtk_history_window_view history_window(ctrl);
+        gtk_history_window_view history_window(ctrl, ctrl);
 
         // connect to model
-        m.add_view(history_menu);
-        m.add_view(history_window);
+        util::add_view<clipboard::view>(m, history_menu);
+        util::add_view<clipboard::view>(m, history_window);
+        util::add_view<freezable::view>(m, history_window);
 
         Gtk::AboutDialog about_dialog;
         about_dialog.set_program_name(PACKAGE);
@@ -81,7 +78,7 @@ int main(int argc, char ** argv)
 
         clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
         edit_history_item.signal_activate().connect([&](){ history_window.show(); });
-        m.add_view(enabled_item);
+        util::add_view<freezable::view>(m, enabled_item);
         about_item.signal_activate().connect(
             [&]()
             {

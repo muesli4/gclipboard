@@ -1,7 +1,7 @@
 #include "gtk_enabled_menu_item_view.hpp"
 
 
-gtk_enabled_menu_item_view::gtk_enabled_menu_item_view(Glib::ustring const & label, clipboard::controller & ctrl)
+gtk_enabled_menu_item_view::gtk_enabled_menu_item_view(Glib::ustring const & label, freezable::controller & ctrl)
     : Gtk::CheckMenuItem(label)
     , _ctrl(ctrl)
 {
@@ -9,39 +9,7 @@ gtk_enabled_menu_item_view::gtk_enabled_menu_item_view(Glib::ustring const & lab
     setup_default_signal_toggled_handler();
 }
 
-void gtk_enabled_menu_item_view::on_move_front(unsigned int id)
-{
-}
-
-void gtk_enabled_menu_item_view::on_select_active(unsigned int id)
-{
-}
-
-void gtk_enabled_menu_item_view::on_unselect_active(unsigned int id)
-{
-}
-
-void gtk_enabled_menu_item_view::on_clear()
-{
-}
-
-void gtk_enabled_menu_item_view::on_add(std::string const & s, unsigned int id)
-{
-}
-
-void gtk_enabled_menu_item_view::on_remove(unsigned int id)
-{
-}
-
-void gtk_enabled_menu_item_view::on_remove_oldest()
-{
-}
-
-void gtk_enabled_menu_item_view::on_change(unsigned int id, std::string const & s)
-{
-}
-
-void gtk_enabled_menu_item_view::on_freeze(clipboard::request_type rt)
+void gtk_enabled_menu_item_view::on_freeze(freezable::request_type rt)
 {
     set_active_silently(false);
 }
@@ -58,11 +26,11 @@ void gtk_enabled_menu_item_view::setup_default_signal_toggled_handler()
         {
             if (this->get_active())
             {
-                _ctrl.clipboard_thaw(clipboard::request_type::USER);
+                _ctrl.freezable_thaw(freezable::request_type::USER);
             }
             else
             {
-                _ctrl.clipboard_freeze(clipboard::request_type::USER);
+                _ctrl.freezable_freeze(freezable::request_type::USER);
             }
         }
     );

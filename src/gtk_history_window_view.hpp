@@ -12,10 +12,12 @@
 
 #include "clipboard/controller.hpp"
 #include "clipboard/view.hpp"
+#include "freezable/controller.hpp"
+#include "freezable/view.hpp"
 
-struct gtk_history_window_view : public Gtk::Window, clipboard::view
+struct gtk_history_window_view : public Gtk::Window, clipboard::view, freezable::view
 {
-    gtk_history_window_view(clipboard::controller & ctrl);
+    gtk_history_window_view(clipboard::controller & cc, freezable::controller & fc);
 
     ~gtk_history_window_view();
 
@@ -27,7 +29,7 @@ struct gtk_history_window_view : public Gtk::Window, clipboard::view
     void on_remove(unsigned int id);
     void on_remove_oldest();
     void on_change(unsigned int id, std::string const & s);
-    void on_freeze(clipboard::request_type rt);
+    void on_freeze(freezable::request_type rt);
     void on_thaw();
 
     private:
@@ -66,7 +68,9 @@ struct gtk_history_window_view : public Gtk::Window, clipboard::view
     // the gtk view
     Gtk::ListViewText _list_view_text;
 
-    clipboard::controller & _ctrl;
+    clipboard::controller & _cc;
+    freezable::controller & _fc;
+
 };
 
 #endif

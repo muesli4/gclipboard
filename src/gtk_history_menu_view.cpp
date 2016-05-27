@@ -134,14 +134,6 @@ void gtk_history_menu_view::on_change(unsigned int id, std::string const & s)
     }
 }
 
-void gtk_history_menu_view::on_freeze(clipboard::request_type rt)
-{
-}
-
-void gtk_history_menu_view::on_thaw()
-{
-}
-
 void gtk_history_menu_view::set_pango_options_to_label(Gtk::MenuItem & mi)
 {
     auto l = dynamic_cast<Gtk::Label *>(mi.get_child());
