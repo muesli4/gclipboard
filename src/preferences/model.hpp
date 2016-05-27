@@ -8,6 +8,7 @@ namespace preferences
 {
     struct model : util::model_template<preferences::view>
     {
+        void emit_history_size_change(unsigned int new_size);
     };
 }
 

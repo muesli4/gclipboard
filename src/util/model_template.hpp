@@ -2,6 +2,26 @@
 #define GCLIPBOARD_UTIL_MODEL_HPP
 
 #include <algorithm>
+#include <vector>
+
+// some macros to define the corresponding emit functions
+#define DEFINE_MODEL_EMIT0(name) \
+    void model::emit_##name ()\
+    {\
+        emit_view_method(&view::on_##name );\
+    }
+
+#define DEFINE_MODEL_EMIT1(name, t1, n1) \
+    void model::emit_##name ( t1 n1 )\
+    {\
+        emit_view_method(&view::on_##name , n1);\
+    }
+
+#define DEFINE_MODEL_EMIT2(name, t1, n1, t2, n2) \
+    void model::emit_##name ( t1 n1 , t2 n2 )\
+    {\
+        emit_view_method(&view::on_##name , n1 , n2);\
+    }
 
 namespace util
 {
@@ -25,7 +45,7 @@ namespace util
         protected:
 
         template <typename... FunArgs, typename... GivenArgs>
-        void emit_view_method(void (View::*method_ptr)(FunArgs...), GivenArgs... args)
+        inline void emit_view_method(void (View::*method_ptr)(FunArgs...), GivenArgs... args)
         {
             for (View * v : _view_ptrs)
             {
