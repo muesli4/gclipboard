@@ -11,6 +11,9 @@
 #include "gtk_history_menu_view.hpp"
 #include "gtk_history_window_view.hpp"
 #include "gtk_enabled_menu_item_view.hpp"
+#include "gsettings_preferences_model.hpp"
+#include "gtk_preferences_window.hpp"
+#include "default_preferences_controller.hpp"
 
 #include "gettext.h"
 
@@ -22,7 +25,7 @@
 //         ↹ for tab
 
 char const * const icon_name = "edit-paste";
-
+char const * const appid = "com.github.muesli4.gclipboard";
 
 int main(int argc, char ** argv)
 {
@@ -31,7 +34,7 @@ int main(int argc, char ** argv)
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
 
-    auto app_ref = Gtk::Application::create(argc, argv, "com.github.muesli4.gclipboard");
+    auto app_ref = Gtk::Application::create(argc, argv, appid);
 
     app_ref->register_application();
 
@@ -40,11 +43,20 @@ int main(int argc, char ** argv)
     {
         auto status_icon_ref = Gtk::StatusIcon::create(icon_name);
 
+        gsettings_preferences_model gsettings_prefs(appid);
+
+        default_preferences_controller pref_ctrl(gsettings_prefs);
+
+        gtk_preferences_window pref_window(pref_ctrl);
+        util::add_view<preferences::view>(gsettings_prefs, pref_window);
+
         // a clipboard model which uses the Gtk::Clipboard class provided by
         // Gtkmm to manage both clipboards
-        gtk_clipboard_model m(10);
+        gtk_clipboard_model clipboard_model(10);
 
-        default_clipboard_controller ctrl(m, m);
+        util::add_view<preferences::view>(gsettings_prefs, clipboard_model);
+
+        default_clipboard_controller ctrl(clipboard_model, clipboard_model);
 
         // left click menu
         gtk_history_menu_view history_menu(ctrl);
@@ -53,9 +65,9 @@ int main(int argc, char ** argv)
         gtk_history_window_view history_window(ctrl, ctrl);
 
         // connect to model
-        util::add_view<clipboard::view>(m, history_menu);
-        util::add_view<clipboard::view>(m, history_window);
-        util::add_view<freezable::view>(m, history_window);
+        util::add_view<clipboard::view>(clipboard_model, history_menu);
+        util::add_view<clipboard::view>(clipboard_model, history_window);
+        util::add_view<freezable::view>(clipboard_model, history_window);
 
         Gtk::AboutDialog about_dialog;
         about_dialog.set_program_name(PACKAGE);
@@ -78,7 +90,7 @@ int main(int argc, char ** argv)
 
         clear_item.signal_activate().connect([&](){ ctrl.clipboard_clear(); });
         edit_history_item.signal_activate().connect([&](){ history_window.show(); });
-        util::add_view<freezable::view>(m, enabled_item);
+        util::add_view<freezable::view>(clipboard_model, enabled_item);
         about_item.signal_activate().connect(
             [&]()
             {
@@ -88,7 +100,12 @@ int main(int argc, char ** argv)
                 app_ref->remove_window(about_dialog);
             }
         );
-        settings_item.set_sensitive(false);
+        settings_item.signal_activate().connect(
+            [&]()
+            {
+                pref_window.show();
+            }
+        );
         sigc::connection quit_con = quit_item.signal_activate().connect(
             [&]()
             {

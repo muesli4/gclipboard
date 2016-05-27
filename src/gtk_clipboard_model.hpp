@@ -8,8 +8,9 @@
 #include "clipboard/model.hpp"
 #include "freezable/model.hpp"
 #include "freezable/request_type.hpp"
+#include "preferences/view.hpp"
 
-struct gtk_clipboard_model : clipboard::model, freezable::model
+struct gtk_clipboard_model : clipboard::model, freezable::model, preferences::view
 {
     gtk_clipboard_model(unsigned int buffer_size);
 
@@ -29,11 +30,13 @@ struct gtk_clipboard_model : clipboard::model, freezable::model
 
     private:
 
-    void handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source, void (gtk_clipboard_model::*update_other_silently)(std::string const &));
+    void on_history_size_change(unsigned int new_size);
+
     void setup_primary_default_owner_change_handler();
     void setup_clipboard_default_owner_change_handler();
     void update_primary_silently(std::string const & s);
     void update_clipboard_silently(std::string const & s);
+    void handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source, void (gtk_clipboard_model::*update_other_silently)(std::string const &));
 
     void update_active_id(unsigned int id);
 

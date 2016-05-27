@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gclipboard 0.1.0\n"
 "Report-Msgid-Bugs-To: muesli4@gmail.com\n"
-"POT-Creation-Date: 2016-05-21 17:20+0200\n"
+"POT-Creation-Date: 2016-05-27 15:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,28 +17,36 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.cpp:107
+#: src/main.cpp:76
 msgid ""
 "A clean and simple clipboard manager, which has been influenced by other "
 "popular clipboard managers."
 msgstr ""
 
-#: src/main.cpp:116
+#: src/main.cpp:84
 msgid "Enable history"
 msgstr ""
 
-#: src/gtk_left_menu_view.cpp:12
+#: src/gtk_history_menu_view.cpp:12
 msgid "Empty"
 msgstr ""
 
-#: src/gtk_history_window_view.cpp:219
+#: src/gtk_history_window_view.cpp:222
 msgid "manually"
 msgstr ""
 
-#: src/gtk_history_window_view.cpp:219
+#: src/gtk_history_window_view.cpp:222
 msgid "frozen"
 msgstr ""
 
-#: src/gtk_history_window_view.cpp:236
+#: src/gtk_history_window_view.cpp:239
 msgid "History"
+msgstr ""
+
+#: src/gtk_preferences_window.cpp:8
+msgid "History size"
+msgstr ""
+
+#: src/gtk_preferences_window.cpp:33
+msgid "Clipboard"
 msgstr ""

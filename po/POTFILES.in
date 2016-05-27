@@ -1,4 +1,6 @@
 src/main.cpp
-src/gtk_left_menu_view.cpp
+src/gtk_history_menu_view.cpp
 src/gtk_history_window_view.cpp
 src/gtk_edit_entry_dialog.cpp
+src/gtk_enabled_menu_item_view.cpp
+src/gtk_preferences_window.cpp

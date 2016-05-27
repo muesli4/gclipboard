@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <schemalist>
-    <schema path="/com/github/muesli4/gclipboard/" id="com.github.muesli4.gclipboard">
+    <!--
+         path="/com/github/muesli4/gclipboard/"
+    -->
+    <schema id="com.github.muesli4.gclipboard">
         <key name='history-size' type='i'>
             <default>10</default>
             <summary>The size of the history</summary>

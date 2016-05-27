@@ -15,6 +15,139 @@ gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     setup_clipboard_default_owner_change_handler();
 }
 
+void gtk_clipboard_model::clear()
+{
+    update_primary_silently("");
+    update_clipboard_silently("");
+    _text_buffer.clear();
+    _active_valid = false;
+    emit_clear();
+}
+
+void gtk_clipboard_model::select_active(unsigned int id)
+{
+    auto it = find_id(id);
+    if (it != _text_buffer.end())
+    {
+        auto text = it->first;
+        update_primary_silently(text);
+        update_clipboard_silently(text);
+        update_active_id(id);
+
+        // additionally this model will move active entries to the front
+        std::rotate( _text_buffer.begin()
+                   , it
+                   , it + 1
+                   );
+
+        emit_move_front(id);
+    }
+}
+
+void gtk_clipboard_model::remove(unsigned int id)
+{
+    auto it = find_id(id);
+    if (it != _text_buffer.end())
+    {
+        _text_buffer.erase(it);
+
+        // did we delete the active entry?
+        if (_active_valid && _active_id == id && !_text_buffer.empty())
+        {
+            // then first unselect it
+            emit_unselect_active(_active_id);
+
+            // make the first entry the active one
+            auto const & p = _text_buffer.front();
+            auto text = p.first;
+            update_primary_silently(text);
+            update_clipboard_silently(text);
+
+            _active_id = p.second;
+            emit_select_active(_active_id);
+        }
+
+        emit_remove(id);
+    }
+}
+
+void gtk_clipboard_model::change(unsigned int id, std::string const & s)
+{
+    auto it = find_id(id);
+    if (it != _text_buffer.end())
+    {
+        it->first = s;
+        emit_change(id, s);
+    }
+}
+
+void gtk_clipboard_model::freeze(freezable::request_type rt)
+{
+    // aquire the mutex to ensure that the last update will finish, if any
+    std::lock_guard<std::mutex> lock(_owner_change_mutex);
+
+    // always prefer user choices
+    if (_frozen && rt != _frozen_request_type)
+    {
+
+        if (_frozen_request_type == freezable::request_type::SYSTEM)
+        {
+            emit_freeze(freezable::request_type::USER);
+        }
+        _frozen_request_type = freezable::request_type::USER;
+    }
+    else
+    {
+        _frozen = true;
+        _frozen_request_type = rt;
+        emit_freeze(rt);
+    }
+
+
+}
+
+void gtk_clipboard_model::thaw(freezable::request_type rt)
+{
+    if (rt == freezable::request_type::USER || rt == _frozen_request_type)
+    {
+        // thaw if same request type as freeze or if user wants to
+        _frozen = false;
+        emit_thaw();
+    }
+}
+
+gtk_clipboard_model::~gtk_clipboard_model()
+{
+}
+
+void gtk_clipboard_model::init_view(clipboard::view & v)
+{
+    for (auto p : _text_buffer)
+        v.on_add(p.first, p.second);
+
+    if (_active_valid)
+        v.on_select_active(_active_id);
+}
+
+void gtk_clipboard_model::init_view(freezable::view & v)
+{
+    if (_frozen)
+        v.on_freeze(_frozen_request_type);
+}
+
+// precondition: we can assume it is at least one
+void gtk_clipboard_model::on_history_size_change(unsigned int new_size)
+{
+    while (_text_buffer.size() > new_size)
+    {
+        _text_buffer.pop_back();
+        emit_remove_oldest();
+    }
+
+    _text_buffer.set_capacity(new_size);
+
+}
+
 void gtk_clipboard_model::setup_primary_default_owner_change_handler()
 {
     _primary_con = _primary_ref->signal_owner_change().connect(
@@ -134,128 +267,8 @@ void gtk_clipboard_model::update_active_id(unsigned int id)
     emit_select_active(id);
 }
 
-void gtk_clipboard_model::clear()
-{
-    update_primary_silently("");
-    update_clipboard_silently("");
-    _text_buffer.clear();
-    _active_valid = false;
-    emit_clear();
-}
-
-void gtk_clipboard_model::select_active(unsigned int id)
-{
-    auto it = find_id(id);
-    if (it != _text_buffer.end())
-    {
-        auto text = it->first;
-        update_primary_silently(text);
-        update_clipboard_silently(text);
-        update_active_id(id);
-
-        // additionally this model will move active entries to the front
-        std::rotate( _text_buffer.begin()
-                   , it
-                   , it + 1
-                   );
-
-        emit_move_front(id);
-    }
-}
-
-void gtk_clipboard_model::remove(unsigned int id)
-{
-    auto it = find_id(id);
-    if (it != _text_buffer.end())
-    {
-        _text_buffer.erase(it);
-
-        // did we delete the active entry?
-        if (_active_valid && _active_id == id && !_text_buffer.empty())
-        {
-            // then first unselect it
-            emit_unselect_active(_active_id);
-
-            // make the first entry the active one
-            auto const & p = _text_buffer.front();
-            auto text = p.first;
-            update_primary_silently(text);
-            update_clipboard_silently(text);
-
-            _active_id = p.second;
-            emit_select_active(_active_id);
-        }
-
-        emit_remove(id);
-    }
-}
-
-void gtk_clipboard_model::change(unsigned int id, std::string const & s)
-{
-    auto it = find_id(id);
-    if (it != _text_buffer.end())
-    {
-        it->first = s;
-        emit_change(id, s);
-    }
-}
-
-void gtk_clipboard_model::freeze(freezable::request_type rt)
-{
-    // aquire the mutex to ensure that the last update will finish, if any
-    std::lock_guard<std::mutex> lock(_owner_change_mutex);
-
-    // always prefer user choices
-    if (_frozen && rt != _frozen_request_type)
-    {
-
-        if (_frozen_request_type == freezable::request_type::SYSTEM)
-        {
-            emit_freeze(freezable::request_type::USER);
-        }
-        _frozen_request_type = freezable::request_type::USER;
-    }
-    else
-    {
-        _frozen = true;
-        _frozen_request_type = rt;
-        emit_freeze(rt);
-    }
-
-
-}
-
-void gtk_clipboard_model::thaw(freezable::request_type rt)
-{
-    if (rt == freezable::request_type::USER || rt == _frozen_request_type)
-    {
-        // thaw if same request type as freeze or if user wants to
-        _frozen = false;
-        emit_thaw();
-    }
-}
-
 gtk_clipboard_model::iterator gtk_clipboard_model::find_id(unsigned int id)
 {
     return find_if(_text_buffer.begin(), _text_buffer.end(), [id](std::pair<std::string, unsigned int> const & p) { return p.second == id; });
-}
-
-gtk_clipboard_model::~gtk_clipboard_model()
-{
-}
-
-void gtk_clipboard_model::init_view(clipboard::view & v)
-{
-    for (auto p : _text_buffer)
-        v.on_add(p.first, p.second);
-
-    if (_active_valid)
-        v.on_select_active(_active_id);
-}
-
-void gtk_clipboard_model::init_view(freezable::view & v)
-{
-    if (_frozen)
-        v.on_freeze(_frozen_request_type);
 }
 
