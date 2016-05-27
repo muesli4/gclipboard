@@ -3,6 +3,8 @@
 #include <utility>
 #include <iterator>
 
+#include <iostream>
+
 gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     : _text_buffer(buffer_size)
     , _active_valid(false)
@@ -22,6 +24,7 @@ void gtk_clipboard_model::clear()
     _text_buffer.clear();
     _active_valid = false;
     emit_clear();
+    std::cout << "post clear " << _text_buffer.size() << std::endl;
 }
 
 void gtk_clipboard_model::select_active(unsigned int id)
@@ -163,6 +166,7 @@ void gtk_clipboard_model::restore_template(std::vector<std::pair<unsigned int, s
 
 void gtk_clipboard_model::save_template(std::vector<std::pair<unsigned int, std::string>> & entries, bool & active_valid, unsigned int & active_id)
 {
+    std::cout << _text_buffer.size() << std::endl;
     for (auto const & p : _text_buffer)
     {
         entries.emplace_back(p.second, p.first);
@@ -214,7 +218,7 @@ void gtk_clipboard_model::update_primary_silently(std::string const & s)
     _primary_con = _primary_ref->signal_owner_change().connect(
         [&](GdkEventOwnerChange * e)
         {
-            // TODO check if value is uneqal to the one set
+            // in rare cases a value might slip in between?
             _primary_con.disconnect();
             setup_primary_default_owner_change_handler();
         }
@@ -228,7 +232,7 @@ void gtk_clipboard_model::update_clipboard_silently(std::string const & s)
     _clipboard_con = _clipboard_ref->signal_owner_change().connect(
         [&](GdkEventOwnerChange * e)
         {
-            // TODO check if value is uneqal to the one set
+            // in rare cases a value might slip in between?
             _clipboard_con.disconnect();
             setup_clipboard_default_owner_change_handler();
         }
@@ -268,7 +272,8 @@ void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, Glib::Ref
 
                 // Since one can't reliably distinguish between self-emitted
                 // events and outside events the string serves as indicator.
-                if (_text_buffer.empty() || text != _text_buffer.front().first)
+                // Additionally some applications send the empty string when quitting.
+                if (!text.empty() && (_text_buffer.empty() || text != _text_buffer.front().first))
                 {
                     // sync with other clipboard
                     (this->*update_other_silently)(text);
