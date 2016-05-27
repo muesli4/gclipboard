@@ -1,11 +1,13 @@
 #ifndef GCLIPBOARD_CLIPBOARD_MODEL_HPP
 #define GCLIPBOARD_CLIPBOARD_MODEL_HPP
 
+#include <string>
 #include <vector>
 
 #include "view.hpp"
 
 #include "../util/model_template.hpp"
+#include "../preferences/session_data.hpp"
 
 namespace clipboard
 {
@@ -22,7 +24,14 @@ namespace clipboard
 
         virtual ~model();
 
+        void restore(preferences::session_data const & sd);
+        void save(preferences::session_data & sd);
+
         protected:
+
+        // TODO maybe refactor into a subclass like restorable_clipboard
+        virtual void restore_template(std::vector<std::pair<unsigned int, std::string>> const & entries, bool active_valid, unsigned int active_id) = 0;
+        virtual void save_template(std::vector<std::pair<unsigned int, std::string>> & entries, bool & active_valid, unsigned int & active_id) = 0;
 
         // signals used to message all views about changes in the model
         void emit_move_front(unsigned int id);

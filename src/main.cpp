@@ -17,6 +17,8 @@
 
 #include "gettext.h"
 
+#include <iostream>
+
 // TODO settings
 // TODO save session
 // TODO add unicode symbols in lines to show special whitespace characters:
@@ -55,6 +57,9 @@ int main(int argc, char ** argv)
         gtk_clipboard_model clipboard_model(10);
 
         util::add_view<preferences::view>(gsettings_prefs, clipboard_model);
+
+        // restore session
+        gsettings_prefs.restore_into(clipboard_model);
 
         default_clipboard_controller ctrl(clipboard_model, clipboard_model);
 
@@ -143,7 +148,12 @@ int main(int argc, char ** argv)
         );
 
         app_ref->hold();
-        return app_ref->run(argc, argv);
+        int result = app_ref->run(argc, argv);
+        // save session
+        std::cout << "pre" << std::endl;
+        gsettings_prefs.save_from(clipboard_model);
+        std::cout << "post" << std::endl;
+        return result;
     }
 }
 

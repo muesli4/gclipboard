@@ -9,6 +9,7 @@ struct default_preferences_controller : preferences::controller
     default_preferences_controller(preferences::model & m);
 
     void preferences_set_history_size(unsigned int new_size);
+    void preferences_set_session_restore(bool restore);
 
     private:
 

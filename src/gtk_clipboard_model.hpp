@@ -28,9 +28,13 @@ struct gtk_clipboard_model : clipboard::model, freezable::model, preferences::vi
     void init_view(clipboard::view & v);
     void init_view(freezable::view & v);
 
+    void restore_template(std::vector<std::pair<unsigned int, std::string>> const & entries, bool active_valid, unsigned int active_id);
+    void save_template(std::vector<std::pair<unsigned int, std::string>> & entries, bool & active_valid, unsigned int & active_id);
+
     private:
 
     void on_history_size_change(unsigned int new_size);
+    void on_session_restore_change(bool restore);
 
     void setup_primary_default_owner_change_handler();
     void setup_clipboard_default_owner_change_handler();

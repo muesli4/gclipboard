@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gclipboard 0.1.0\n"
 "Report-Msgid-Bugs-To: muesli4@gmail.com\n"
-"POT-Creation-Date: 2016-05-27 15:34+0200\n"
+"POT-Creation-Date: 2016-05-27 23:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,13 +17,13 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.cpp:76
+#: src/main.cpp:81
 msgid ""
 "A clean and simple clipboard manager, which has been influenced by other "
 "popular clipboard managers."
 msgstr ""
 
-#: src/main.cpp:84
+#: src/main.cpp:89
 msgid "Enable history"
 msgstr ""
 
@@ -43,10 +43,18 @@ msgstr ""
 msgid "History"
 msgstr ""
 
-#: src/gtk_preferences_window.cpp:8
+#: src/gtk_preferences_window.cpp:7
 msgid "History size"
 msgstr ""
 
-#: src/gtk_preferences_window.cpp:33
+#: src/gtk_preferences_window.cpp:9
+msgid "Restore session"
+msgstr ""
+
+#: src/gtk_preferences_window.cpp:14
+msgid "Preferences"
+msgstr ""
+
+#: src/gtk_preferences_window.cpp:56
 msgid "Clipboard"
 msgstr ""

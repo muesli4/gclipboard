@@ -9,3 +9,8 @@ void default_preferences_controller::preferences_set_history_size(unsigned int n
 {
     _m.set_history_size(new_size);
 }
+
+void default_preferences_controller::preferences_set_session_restore(bool restore)
+{
+    _m.set_session_restore(restore);
+}

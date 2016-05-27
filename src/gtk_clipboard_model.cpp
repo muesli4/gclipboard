@@ -135,6 +135,42 @@ void gtk_clipboard_model::init_view(freezable::view & v)
         v.on_freeze(_frozen_request_type);
 }
 
+void gtk_clipboard_model::restore_template(std::vector<std::pair<unsigned int, std::string>> const & entries, bool active_valid, unsigned int active_id)
+{
+    if (_active_valid)
+    {
+        emit_unselect_active(_active_id);
+        _active_valid = false;
+    }
+    _text_buffer.clear();
+    emit_clear();
+    
+    for (auto it = entries.rbegin(); it != entries.rend(); ++it)
+    {
+        std::pair<unsigned int, std::string> const & p = *it;
+        unsigned int id = p.first;
+        std::string const & s = p.second;
+        _text_buffer.push_front(std::make_pair(s, id));
+        emit_add(s, id);
+    }
+
+    if (active_valid && find_id(active_id) != _text_buffer.end())
+    {
+        _active_valid = true;
+        _active_id = active_id;
+    }
+}
+
+void gtk_clipboard_model::save_template(std::vector<std::pair<unsigned int, std::string>> & entries, bool & active_valid, unsigned int & active_id)
+{
+    for (auto const & p : _text_buffer)
+    {
+        entries.emplace_back(p.second, p.first);
+    }
+    active_valid = _active_valid;
+    active_id = _active_id;
+}
+
 // precondition: we can assume it is at least one
 void gtk_clipboard_model::on_history_size_change(unsigned int new_size)
 {
@@ -146,6 +182,10 @@ void gtk_clipboard_model::on_history_size_change(unsigned int new_size)
 
     _text_buffer.set_capacity(new_size);
 
+}
+
+void gtk_clipboard_model::on_session_restore_change(bool restore)
+{
 }
 
 void gtk_clipboard_model::setup_primary_default_owner_change_handler()

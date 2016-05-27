@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <schemalist>
-    <!--
-         path="/com/github/muesli4/gclipboard/"
-    -->
-    <schema id="com.github.muesli4.gclipboard">
-        <key name='history-size' type='i'>
+    <schema path="/com/github/muesli4/gclipboard/" id="com.github.muesli4.gclipboard">
+        <key name='history-size' type='u'>
             <default>10</default>
             <summary>The size of the history</summary>
             <description>
@@ -13,6 +10,22 @@
                 has to be dropped to make space for a new one.
             </description>
             <range min='1' max='100000' />
+        </key>
+        <key name='session-restore' type='b'>
+            <default>false</default>
+            <summary>Whether the session should be saved and restored</summary>
+            <description>
+                Saves the entries of the current session and loads them on startup.
+            </description>
+        </key>
+        <key name='session-data' type='(ua(uay)mu)'>
+            <default>(0, [], nothing)</default>
+            <summary>
+                Session data to be saved or restored.
+            </summary>
+            <description>
+                Contains the session data. This should not be edited manually.
+            </description>
         </key>
     </schema>
 </schemalist>
