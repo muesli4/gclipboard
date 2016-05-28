@@ -10,6 +10,7 @@ gtk_edit_entry_dialog::gtk_edit_entry_dialog(std::vector<std::pair<std::string, 
     , _row_boxes(es.size())
 {
     auto vbox_ptr = this->get_vbox();
+    vbox_ptr->property_margin() = 4;
     for (std::size_t n = 0; n < es.size(); ++n)
     {
         auto p = es[n];

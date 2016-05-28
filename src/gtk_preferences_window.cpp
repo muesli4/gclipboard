@@ -8,7 +8,7 @@ gtk_preferences_window::gtk_preferences_window(preferences::controller & c)
     , _history_size_spin_button(2, 6)
     , _session_restore_label(gettext("Restore session") + std::string(":"))
     , _button_box()
-    , _cancel_button(Gtk::Stock::CANCEL)
+    , _close_button(Gtk::Stock::CLOSE)
     , _apply_button(Gtk::Stock::APPLY)
 {
     this->set_title(gettext("Preferences"));
@@ -16,7 +16,7 @@ gtk_preferences_window::gtk_preferences_window(preferences::controller & c)
     this->set_default_size(500, 300);
     this->set_resizable(false);
     this->set_position(Gtk::WIN_POS_CENTER_ALWAYS);
-    _cancel_button.signal_clicked().connect(
+    _close_button.signal_clicked().connect(
         [&]()
         {
             this->hide();
@@ -61,10 +61,12 @@ gtk_preferences_window::gtk_preferences_window(preferences::controller & c)
     _button_box.set_halign(Gtk::ALIGN_END);
     _button_box.set_homogeneous(true);
     _button_box.set_spacing(2);
-    _button_box.pack_start(_cancel_button, false, false, 2);
     _button_box.pack_start(_apply_button, false, false, 2);
+    _button_box.pack_start(_close_button, false, false, 2);
 
     _vbox.pack_end(_button_box, false, false, 2);
+
+    _vbox.property_margin() = 2;
 
     _vbox.show_all();
     this->add(_vbox);

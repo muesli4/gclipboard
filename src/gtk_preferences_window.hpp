@@ -18,7 +18,6 @@ struct gtk_preferences_window : Gtk::Window, preferences::view
 {
     gtk_preferences_window(preferences::controller & c);
 
-
     private:
 
     void on_history_size_change(unsigned int new_size);
@@ -40,7 +39,7 @@ struct gtk_preferences_window : Gtk::Window, preferences::view
     // buttons on the bottom
     Gtk::HButtonBox _button_box;
 
-    Gtk::Button _cancel_button;
+    Gtk::Button _close_button;
     Gtk::Button _apply_button;
 };
 
