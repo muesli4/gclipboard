@@ -6,12 +6,13 @@ char const * const session_data_name = "session-data";
 
 gsettings_preferences_model::gsettings_preferences_model(Glib::ustring const & schema_id)
     : _settings_ref(Gio::Settings::create(schema_id))
+    , _reset_session_data(false)
 {
     // history-size
     _settings_ref->signal_changed(history_size_name).connect(
             [&](Glib::ustring const &)
             {
-                emit_history_size_change(get_history_size());
+                emit_history_size_change(read_history_size());
             }
     );
 
@@ -19,17 +20,31 @@ gsettings_preferences_model::gsettings_preferences_model(Glib::ustring const & s
     _settings_ref->signal_changed(session_restore_name).connect(
             [&](Glib::ustring const &)
             {
-                _restore_session = get_session_restore();
-                emit_session_restore_change(_restore_session);
+                bool v = read_session_restore();
+
+                if (v != _restore_session)
+                {
+                    _restore_session = v;
+                    _reset_session_data = !_restore_session;
+                    emit_session_restore_change(_restore_session);
+                }
             }
     );
 
-    _restore_session = get_session_restore();
+    _restore_session = read_session_restore();
+}
+
+gsettings_preferences_model::~gsettings_preferences_model()
+{
+    // reset all session data when we don't need it anymore
+    if (_reset_session_data)
+    {
+        _settings_ref->reset(session_data_name);
+    }
 }
 
 void gsettings_preferences_model::set_history_size(unsigned int new_size)
 {
-    // FIXME typo in gtkmm?
     _settings_ref->set_value(history_size_name, Glib::Variant<guint32>::create(new_size));
 }
 
@@ -123,19 +138,19 @@ void gsettings_preferences_model::restore_into(clipboard::model & m)
     }
 }
 
-unsigned int gsettings_preferences_model::get_history_size()
+unsigned int gsettings_preferences_model::read_history_size()
 {
     return _settings_ref->get_uint(history_size_name);
 }
 
-bool gsettings_preferences_model::get_session_restore()
+bool gsettings_preferences_model::read_session_restore()
 {
     return _settings_ref->get_boolean(session_restore_name);
 }
 
 void gsettings_preferences_model::init_view(preferences::view & v)
 {
-    v.on_history_size_change(get_history_size());
-    v.on_session_restore_change(get_session_restore());
+    v.on_history_size_change(read_history_size());
+    v.on_session_restore_change(_restore_session);
 }
 
