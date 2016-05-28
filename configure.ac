@@ -1,4 +1,4 @@
-AC_INIT([gclipboard], [0.1.0], [muesli4@gmail.com])
+AC_INIT([gclipboard], [0.0.1], [muesli4@gmail.com])
 AC_CONFIG_MACRO_DIR([m4])
 
 # TODO what options to we need to pass?
