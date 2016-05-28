@@ -131,6 +131,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & cc, fre
     );
     _close_button.signal_released().connect([&](){ this->hide(); });
 
+    _button_box.set_homogeneous(true);
     _button_box.pack_start(_edit_button, true, true, 1);
     _button_box.pack_start(_remove_button, true, true, 1);
     _button_box.pack_start(_clear_button, true, true, 1);
