@@ -70,7 +70,6 @@ struct gtk_history_window_view : public Gtk::Window, clipboard::view, freezable:
 
     clipboard::controller & _cc;
     freezable::controller & _fc;
-
 };
 
 #endif
