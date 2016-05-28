@@ -1,7 +1,5 @@
 #include "gsettings_preferences_model.hpp"
 
-#include <iostream>
-
 char const * const history_size_name = "history-size";
 char const * const session_restore_name = "session-restore";
 char const * const session_data_name = "session-data";
@@ -109,11 +107,11 @@ void gsettings_preferences_model::restore_into(clipboard::model & m)
             }
         }
         {
-            Variant<guint32> v_active_id = VariantBase::cast_dynamic<Variant<guint32>>(VariantBase::cast_dynamic<VariantContainerBase>(c.get_child(2)).get_child());
-            if (v_active_id)
+            VariantContainerBase maybe_active_id = VariantBase::cast_dynamic<VariantContainerBase>(c.get_child(2));
+            if (maybe_active_id.get_n_children() == 1)
             {
                 sd.active_valid = true;
-                sd.active_id = v_active_id.get();
+                sd.active_id = VariantBase::cast_dynamic<Variant<guint32>>(maybe_active_id.get_child()).get();
             }
             else
             {
