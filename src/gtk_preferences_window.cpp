@@ -54,7 +54,6 @@ gtk_preferences_window::gtk_preferences_window(preferences::controller & c)
     _clipboard_grid.attach(_session_restore_label, 0, 1, 1, 1);
     _clipboard_grid.attach(_session_restore_check_button, 1, 1, 1, 1);
 
-
     _settings_notebook.append_page(_clipboard_grid, gettext("Clipboard"));
 
     _vbox.pack_start(_settings_notebook, true, true, 2);

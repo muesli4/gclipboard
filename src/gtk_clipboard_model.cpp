@@ -3,8 +3,6 @@
 #include <utility>
 #include <iterator>
 
-#include <iostream>
-
 gtk_clipboard_model::gtk_clipboard_model(unsigned int buffer_size)
     : _text_buffer(buffer_size)
     , _active_valid(false)
@@ -24,7 +22,6 @@ void gtk_clipboard_model::clear()
     _text_buffer.clear();
     _active_valid = false;
     emit_clear();
-    std::cout << "post clear " << _text_buffer.size() << std::endl;
 }
 
 void gtk_clipboard_model::select_active(unsigned int id)
@@ -125,8 +122,8 @@ gtk_clipboard_model::~gtk_clipboard_model()
 
 void gtk_clipboard_model::init_view(clipboard::view & v)
 {
-    for (auto p : _text_buffer)
-        v.on_add(p.first, p.second);
+    for (auto it = _text_buffer.rbegin(); it != _text_buffer.rend(); ++it)
+        v.on_add(it->first, it->second);
 
     if (_active_valid)
         v.on_select_active(_active_id);
@@ -148,25 +145,41 @@ void gtk_clipboard_model::restore_template(std::vector<std::pair<unsigned int, s
     _text_buffer.clear();
     emit_clear();
     
-    for (auto it = entries.rbegin(); it != entries.rend(); ++it)
     {
-        std::pair<unsigned int, std::string> const & p = *it;
-        unsigned int id = p.first;
-        std::string const & s = p.second;
-        _text_buffer.push_front(std::make_pair(s, id));
-        emit_add(s, id);
+        auto it = entries.begin();
+        auto const count = std::min(_text_buffer.capacity(), entries.size());
+        for (unsigned int i = 0; i < count; ++i)
+        {
+            std::pair<unsigned int, std::string> const & p = *it;
+            unsigned int id = p.first;
+            std::string const & s = p.second;
+            _text_buffer.push_back(std::make_pair(s, id));
+            it++;
+        }
+    }
+    
+    for (auto it = _text_buffer.rbegin(); it != _text_buffer.rend(); ++it)
+    {
+        emit_add(it->first, it->second);
     }
 
-    if (active_valid && find_id(active_id) != _text_buffer.end())
+
+    if (active_valid)
     {
-        _active_valid = true;
-        _active_id = active_id;
+        auto it = find_id(active_id);
+        if (it != _text_buffer.end())
+        {
+            auto const & text = it->first;
+            _active_valid = true;
+            _active_id = active_id;
+            update_clipboard_silently(text);
+            update_primary_silently(text);
+        }
     }
 }
 
 void gtk_clipboard_model::save_template(std::vector<std::pair<unsigned int, std::string>> & entries, bool & active_valid, unsigned int & active_id)
 {
-    std::cout << _text_buffer.size() << std::endl;
     for (auto const & p : _text_buffer)
     {
         entries.emplace_back(p.second, p.first);
@@ -242,7 +255,6 @@ void gtk_clipboard_model::update_clipboard_silently(std::string const & s)
 
 void gtk_clipboard_model::handle_owner_change(GdkEventOwnerChange * e, Glib::RefPtr<Gtk::Clipboard> source_ref, void (gtk_clipboard_model::*update_other_silently)(std::string const &))
 {
-
     // Some applications send more than one event with the same content.
     if (e->time - _last_time > 40)
     {

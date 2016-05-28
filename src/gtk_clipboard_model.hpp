@@ -14,6 +14,8 @@ struct gtk_clipboard_model : clipboard::model, freezable::model, preferences::vi
 {
     gtk_clipboard_model(unsigned int buffer_size);
 
+    void disable() { _primary_con.disconnect(); _clipboard_con.disconnect(); }
+
     void clear();
     void select_active(unsigned int id);
     void remove(unsigned int id);

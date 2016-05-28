@@ -23,6 +23,8 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & cc, fre
     this->set_default_size(700, 500);
     this->set_position(Gtk::WIN_POS_CENTER_ALWAYS);
 
+    _vbox.property_margin() = 2;
+
     _search_entry.signal_search_changed().connect(
         [&]()
         {

@@ -19,9 +19,7 @@
 
 #include <iostream>
 
-// TODO settings
-// TODO save session
-// TODO add unicode symbols in lines to show special whitespace characters:
+// TODO add unicode symbols in lines to show special whitespace characters (as optional feature):
 //         ␣ for space
 //         ↵ for newline
 //         ↹ for tab
@@ -150,9 +148,7 @@ int main(int argc, char ** argv)
         app_ref->hold();
         int result = app_ref->run(argc, argv);
         // save session
-        std::cout << "pre" << std::endl;
         gsettings_prefs.save_from(clipboard_model);
-        std::cout << "post" << std::endl;
         return result;
     }
 }

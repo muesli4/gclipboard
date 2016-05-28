@@ -4,6 +4,7 @@
 
 char const * const history_size_name = "history-size";
 char const * const session_restore_name = "session-restore";
+char const * const session_data_name = "session-data";
 
 gsettings_preferences_model::gsettings_preferences_model(Glib::ustring const & schema_id)
     : _settings_ref(Gio::Settings::create(schema_id))
@@ -66,6 +67,7 @@ void gsettings_preferences_model::save_from(clipboard::model & m)
 
         GVariant * gvarr = g_variant_new_array(g_variant_type_new("(uay)"), g_array.data(), g_array.size());
 
+        // assumption: VariantBase takes ownerships of gvarr
         tup.emplace_back(Glib::VariantBase(gvarr));
         tup.emplace_back(
             Glib::VariantContainerBase::create_maybe(
@@ -74,14 +76,7 @@ void gsettings_preferences_model::save_from(clipboard::model & m)
             )
         );
 
-        _settings_ref->set_value("session-data", Glib::VariantContainerBase::create_tuple(tup));
-
-        Glib::VariantBase v = Glib::VariantContainerBase::create_tuple(tup);
-        std::cout << (v ? "worked: " : "fail") << v.get_type_string() << " . " << v.print() << std::endl;
-        std::cout.flush();
-
-        // TODO ?
-        //g_free(gvarr);
+        _settings_ref->set_value(session_data_name, Glib::VariantContainerBase::create_tuple(tup));
     }
 }
 
@@ -90,33 +85,30 @@ void gsettings_preferences_model::restore_into(clipboard::model & m)
     using namespace Glib;
     if (_restore_session)
     {
-        std::cout << "loading session data" << std::endl;
         preferences::session_data sd;
 
         // read from GSettings
         VariantBase v;
-        _settings_ref->get_value("session-data", v);
+        _settings_ref->get_value(session_data_name, v);
         VariantContainerBase c = VariantBase::cast_dynamic<VariantContainerBase>(v);
         sd.current_id = VariantBase::cast_dynamic<Variant<guint32>>(c.get_child(0)).get();
 
         {
             VariantContainerBase v_entries = VariantBase::cast_dynamic<VariantContainerBase>(c.get_child(1));
 
-            for (unsigned int i = 0; i < v_entries.get_n_children(); ++i)
+            std::size_t const entry_count = v_entries.get_n_children();
+            for (unsigned int i = 0; i < entry_count; ++i)
             {
-                VariantContainerBase tup = VariantBase::cast_dynamic<VariantContainerBase>(v_entries.get_child(i));
+                VariantContainerBase tuple = VariantBase::cast_dynamic<VariantContainerBase>(v_entries.get_child(i));
 
-                sd.entries.emplace_back(
-                    std::make_pair(
-                        VariantBase::cast_dynamic<Variant<guint32>>(tup.get_child(0)).get(),
-                        VariantBase::cast_dynamic<Variant<std::string>>(tup.get_child(1)).get()
+                sd.entries.emplace_back(std::make_pair(
+                        VariantBase::cast_dynamic<Variant<guint32>>(tuple.get_child(0)).get(),
+                        VariantBase::cast_dynamic<Variant<std::string>>(tuple.get_child(1)).get()
                     )
                 );
             }
         }
         {
-            std::cout << c.get_child(2).get_type_string() << " . " << c.get_child(2).print() << ' ' << (c.get_child(2).is_container() ? "true" : "false") << std::endl;
-            std::cout.flush();
             Variant<guint32> v_active_id = VariantBase::cast_dynamic<Variant<guint32>>(VariantBase::cast_dynamic<VariantContainerBase>(c.get_child(2)).get_child());
             if (v_active_id)
             {
@@ -128,8 +120,6 @@ void gsettings_preferences_model::restore_into(clipboard::model & m)
                 sd.active_valid = false;
             }
         }
-
-
 
         m.restore(sd);
     }
