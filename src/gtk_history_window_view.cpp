@@ -72,9 +72,9 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & cc, fre
     _vbox.pack_start(_scrolled_window, true, true, 2);
 
     // controls
-    _clear_button.signal_released().connect([&](){ _cc.clipboard_clear(); });
+    _clear_button.signal_clicked().connect([&](){ _cc.clipboard_clear(); });
     _remove_button.set_sensitive(false);
-    _remove_button.signal_released().connect(
+    _remove_button.signal_clicked().connect(
         [&]()
         {
             std::vector<unsigned int> ids;
@@ -92,7 +92,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & cc, fre
         }
     );
     _edit_button.set_sensitive(false);
-    _edit_button.signal_released().connect(
+    _edit_button.signal_clicked().connect(
         [&]()
         {
             std::vector<std::pair<std::string, unsigned int>> entries;
@@ -129,7 +129,7 @@ gtk_history_window_view::gtk_history_window_view(clipboard::controller & cc, fre
             _fc.freezable_thaw(freezable::request_type::SYSTEM);
         }
     );
-    _close_button.signal_released().connect([&](){ this->hide(); });
+    _close_button.signal_clicked().connect([&](){ this->hide(); });
 
     _button_box.set_homogeneous(true);
     _button_box.pack_start(_edit_button, true, true, 1);
