@@ -16,7 +16,7 @@ AX_BOOST_BASE([1.35.0],,[AC_MSG_ERROR([boost was not found])])
 AC_CONFIG_FILES([Makefile src/Makefile po/Makefile.in data/Makefile])
 
 AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.19.7])
+AM_GNU_GETTEXT_VERSION([0.20])
 
 GLIB_GSETTINGS
 
