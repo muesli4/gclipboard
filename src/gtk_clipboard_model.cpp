@@ -78,6 +78,13 @@ void gtk_clipboard_model::change(unsigned int id, std::string const & s)
     {
         it->first = s;
         emit_change(id, s);
+
+        // synchronize a changed active entry
+        if (_active_valid && id == _active_id)
+        {
+            update_primary_silently(s);
+            update_clipboard_silently(s);
+        }
     }
 }
 
